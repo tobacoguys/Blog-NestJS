@@ -1,10 +1,11 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, UnauthorizedException } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { InjectRepository } from '@nestjs/typeorm';
 import User from 'src/user/user.entity';
 import * as bcrypt from 'bcryptjs';
 import { Repository } from 'typeorm';
 import { SignupDto } from './dto/signup.dto';
+import { LoginDto } from './dto/login.dto';
 
 @Injectable()
 export class AuthService {
@@ -26,6 +27,28 @@ export class AuthService {
     });
 
     await this.usersRepository.save(user);
+
+    const token = this.jwtService.sign({ id: user.id });
+
+    return { token };
+  }
+
+  async login(loginDto: LoginDto): Promise<{ token: string }> {
+    const { email, password } = loginDto;
+
+    const user = await this.usersRepository.findOne({
+      where: { email },
+    });
+
+    if (!user) {
+      throw new UnauthorizedException('Invalid email or password');
+    }
+
+    const isPasswordMatched = await bcrypt.compare(password, user.password);
+
+    if (!isPasswordMatched) {
+      throw new UnauthorizedException('Invalid email or password');
+    }
 
     const token = this.jwtService.sign({ id: user.id });
 
