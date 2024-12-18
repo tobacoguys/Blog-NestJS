@@ -23,7 +23,7 @@ export class CreateUserDto {
 
   @IsOptional()
   @IsString()
-  bio: string;
+  bio?: string;
 
   @IsOptional()
   @IsDate()
