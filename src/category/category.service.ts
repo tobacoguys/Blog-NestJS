@@ -1,4 +1,8 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import {
+  Injectable,
+  NotFoundException,
+  UnauthorizedException,
+} from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Category } from './category.entity';
 import { Repository } from 'typeorm';
@@ -31,5 +35,24 @@ export class CategoryService {
     }
 
     return category;
+  }
+
+  async deleteCategory(
+    id: string,
+    isAdmin: boolean,
+  ): Promise<{ message: string }> {
+    if (!isAdmin) {
+      throw new UnauthorizedException('Access denied. Admin only.');
+    }
+
+    const category = await this.categoryRepository.findOne({ where: { id } });
+
+    if (!category) {
+      throw new NotFoundException('Category not found');
+    }
+
+    await this.categoryRepository.remove(category);
+
+    return { message: 'Category deleted successfully' };
   }
 }

@@ -1,6 +1,7 @@
 import {
   Body,
   Controller,
+  Delete,
   Get,
   Param,
   Post,
@@ -41,5 +42,13 @@ export class CategoryController {
   async getCategoryById(@Param('id') id: string) {
     const category = await this.categoryService.getCategoryById(id);
     return { data: category };
+  }
+
+  @Delete('/:id')
+  @Private()
+  async deleteCategory(@Param('id') id: string, @Request() req) {
+    const isAdmin = req.user?.isAdmin;
+    const category = await this.categoryService.deleteCategory(id, isAdmin);
+    return category;
   }
 }
