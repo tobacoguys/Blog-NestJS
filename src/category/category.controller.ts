@@ -4,6 +4,7 @@ import {
   Delete,
   Get,
   Param,
+  Patch,
   Post,
   Request,
   UnauthorizedException,
@@ -11,6 +12,7 @@ import {
 import { CategoryService } from './category.service';
 import { Private } from 'src/auth/decorator/private.decorator';
 import { CreateCategoryDto } from './dto/create-category.dto';
+import { UpdateCategoryDto } from './dto/update-category.dto';
 
 @Controller('category')
 export class CategoryController {
@@ -42,6 +44,19 @@ export class CategoryController {
   async getCategoryById(@Param('id') id: string) {
     const category = await this.categoryService.getCategoryById(id);
     return { data: category };
+  }
+
+  @Patch('/:id')
+  @Private()
+  async updateCategory(
+    @Param('id') id: string,
+    @Body() updateCategoryDto: UpdateCategoryDto,
+  ) {
+    const updateCategory = await this.categoryService.updateCategory(
+      id,
+      updateCategoryDto,
+    );
+    return { data: updateCategory };
   }
 
   @Delete('/:id')
