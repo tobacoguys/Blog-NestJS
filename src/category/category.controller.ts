@@ -1,6 +1,7 @@
 import {
   Body,
   Controller,
+  Get,
   Post,
   Request,
   UnauthorizedException,
@@ -27,5 +28,11 @@ export class CategoryController {
     const category =
       await this.categoryService.createCategory(createCategoryDto);
     return { message: 'Category created successfully', data: category };
+  }
+
+  @Get('/getAll')
+  async getAllCategory() {
+    const category = await this.categoryService.getAllCategory();
+    return { message: 'All categories', data: category };
   }
 }

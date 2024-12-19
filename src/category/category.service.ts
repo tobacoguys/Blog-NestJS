@@ -18,4 +18,8 @@ export class CategoryService {
     await this.categoryRepository.save(category);
     return category;
   }
+
+  async getAllCategory(): Promise<Category[]> {
+    return await this.categoryRepository.find();
+  }
 }
