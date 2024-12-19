@@ -20,7 +20,7 @@ class User {
   @Column({ nullable: true, type: 'date' })
   birthday: Date;
 
-  @Column({ default: false })
+  @Column({ default: true })
   isAdmin: boolean;
 }
 

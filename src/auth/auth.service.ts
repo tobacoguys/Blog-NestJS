@@ -54,6 +54,7 @@ export class AuthService {
       id: user.id,
       username: user.username,
       email: user.email,
+      isAdmin: user.isAdmin,
     });
 
     return { user, token };
