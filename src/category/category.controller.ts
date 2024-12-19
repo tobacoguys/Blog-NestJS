@@ -2,6 +2,7 @@ import {
   Body,
   Controller,
   Get,
+  Param,
   Post,
   Request,
   UnauthorizedException,
@@ -34,5 +35,11 @@ export class CategoryController {
   async getAllCategory() {
     const category = await this.categoryService.getAllCategory();
     return { message: 'All categories', data: category };
+  }
+
+  @Get('/:id')
+  async getCategoryById(@Param('id') id: string) {
+    const category = await this.categoryService.getCategoryById(id);
+    return { data: category };
   }
 }
