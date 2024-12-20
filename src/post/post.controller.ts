@@ -1,8 +1,18 @@
-import { Controller, Post, Body, UseGuards } from '@nestjs/common';
+import {
+  Controller,
+  Post,
+  Body,
+  UseGuards,
+  Request,
+  UnauthorizedException,
+  Patch,
+  Param,
+} from '@nestjs/common';
 import { PostService } from './post.service';
 import { CreatePostDto } from './dto/create-post.dto';
 import { JwtAuthGuard } from 'src/auth/guard/jwt-auth.guard';
 import { ApiKeyGuard } from 'src/auth/guard/api-key.guard';
+import { UpdatePostDto } from './dto/update-post.dto';
 
 @Controller('post')
 export class PostController {
@@ -11,8 +21,24 @@ export class PostController {
   @Post('/create')
   @UseGuards(JwtAuthGuard)
   @UseGuards(ApiKeyGuard)
-  async createPost(@Body() createPostDto: CreatePostDto) {
+  async createPost(@Request() req, @Body() createPostDto: CreatePostDto) {
+    const user = req.user;
+
+    if (!user || !user.isCreator) {
+      throw new UnauthorizedException('Access denied. Creator only.');
+    }
     const post = await this.postService.createPost(createPostDto);
     return { message: 'Post created successfully', data: post };
+  }
+
+  @Patch('/:id')
+  @UseGuards(JwtAuthGuard)
+  @UseGuards(ApiKeyGuard)
+  async updatePost(
+    @Param('id') id: string,
+    @Body() updatePostDto: UpdatePostDto,
+  ) {
+    const updatePost = await this.postService.updatePost(id, updatePostDto);
+    return { data: updatePost };
   }
 }

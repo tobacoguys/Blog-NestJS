@@ -9,7 +9,7 @@ export class AdminGuard implements CanActivate {
     const request = context.switchToHttp().getRequest();
     const user = request.user;
 
-    if (!user || user.isAdmin == true) {
+    if (!user || user.isCreator == true) {
       throw new UnauthorizedException('Access denied. Admin only.');
     }
 

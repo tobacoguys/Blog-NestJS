@@ -29,8 +29,8 @@ export class CategoryController {
   ) {
     const user = req.user;
 
-    if (!user || !user.isAdmin) {
-      throw new UnauthorizedException('Access denied. Admin only.');
+    if (!user || !user.isCreator) {
+      throw new UnauthorizedException('Access denied. Creator only.');
     }
     const category =
       await this.categoryService.createCategory(createCategoryDto);
@@ -53,9 +53,15 @@ export class CategoryController {
   @UseGuards(JwtAuthGuard)
   @UseGuards(ApiKeyGuard)
   async updateCategory(
+    @Request() req,
     @Param('id') id: string,
     @Body() updateCategoryDto: UpdateCategoryDto,
   ) {
+    const user = req.user;
+
+    if (!user || !user.isCreator) {
+      throw new UnauthorizedException('Access denied. Creator only.');
+    }
     const updateCategory = await this.categoryService.updateCategory(
       id,
       updateCategoryDto,
@@ -67,8 +73,8 @@ export class CategoryController {
   @UseGuards(JwtAuthGuard)
   @UseGuards(ApiKeyGuard)
   async deleteCategory(@Param('id') id: string, @Request() req) {
-    const isAdmin = req.user?.isAdmin;
-    const category = await this.categoryService.deleteCategory(id, isAdmin);
+    const isCreator = req.user?.isCreator;
+    const category = await this.categoryService.deleteCategory(id, isCreator);
     return category;
   }
 }

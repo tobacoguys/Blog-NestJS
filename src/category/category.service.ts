@@ -54,9 +54,9 @@ export class CategoryService {
 
   async deleteCategory(
     id: string,
-    isAdmin: boolean,
+    isCreator: boolean,
   ): Promise<{ message: string }> {
-    if (!isAdmin) {
+    if (!isCreator) {
       throw new UnauthorizedException('Access denied. Admin only.');
     }
 

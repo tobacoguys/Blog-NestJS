@@ -4,6 +4,7 @@ import { Repository } from 'typeorm';
 import { Post } from './post.entity';
 import { Category } from '../category/category.entity';
 import { CreatePostDto } from './dto/create-post.dto';
+import { UpdatePostDto } from './dto/update-post.dto';
 
 @Injectable()
 export class PostService {
@@ -31,5 +32,16 @@ export class PostService {
     });
 
     return await this.postRepository.save(post);
+  }
+
+  async updatePost(id: string, updatePostDto: UpdatePostDto): Promise<Post> {
+    const post = await this.postRepository.findOne({ where: { id } });
+
+    if (!post) {
+      throw new NotFoundException('Post not found');
+    }
+
+    const updatePost = Object.assign(post, updatePostDto);
+    return this.postRepository.save(updatePost);
   }
 }

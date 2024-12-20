@@ -21,7 +21,7 @@ class User {
   birthday: Date;
 
   @Column({ default: false })
-  isAdmin: boolean;
+  isCreator: boolean;
 }
 
 export default User;
