@@ -6,13 +6,15 @@ import * as bcrypt from 'bcryptjs';
 import { Repository } from 'typeorm';
 import { SignupDto } from './dto/signup.dto';
 import { LoginDto } from './dto/login.dto';
+import { ConfigService } from '@nestjs/config';
 
 @Injectable()
 export class AuthService {
   constructor(
     @InjectRepository(User)
-    private usersRepository: Repository<User>,
-    private jwtService: JwtService,
+    private readonly usersRepository: Repository<User>,
+    private readonly jwtService: JwtService,
+    private readonly configService: ConfigService,
   ) {}
 
   async signup(signupDto: SignupDto): Promise<{ user: any; token: string }> {
@@ -58,5 +60,13 @@ export class AuthService {
     });
 
     return { user, token };
+  }
+
+  validateApiKey(apiKey: string) {
+    const apiKeyServer = this.configService.get('API_KEY');
+    if (apiKey === apiKeyServer) {
+      return true;
+    }
+    return false;
   }
 }

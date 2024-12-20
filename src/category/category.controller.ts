@@ -11,17 +11,18 @@ import {
   UseGuards,
 } from '@nestjs/common';
 import { CategoryService } from './category.service';
-import { Private } from 'src/auth/decorator/private.decorator';
 import { CreateCategoryDto } from './dto/create-category.dto';
 import { UpdateCategoryDto } from './dto/update-category.dto';
 import { JwtAuthGuard } from 'src/auth/guard/jwt-auth.guard';
+import { ApiKeyGuard } from 'src/auth/guard/api-key.guard';
 
 @Controller('category')
 export class CategoryController {
   constructor(private readonly categoryService: CategoryService) {}
 
   @Post('/create')
-  @Private()
+  @UseGuards(JwtAuthGuard)
+  @UseGuards(ApiKeyGuard)
   async createCategory(
     @Request() req,
     @Body() createCategoryDto: CreateCategoryDto,
@@ -50,6 +51,7 @@ export class CategoryController {
 
   @Patch('/:id')
   @UseGuards(JwtAuthGuard)
+  @UseGuards(ApiKeyGuard)
   async updateCategory(
     @Param('id') id: string,
     @Body() updateCategoryDto: UpdateCategoryDto,
@@ -63,6 +65,7 @@ export class CategoryController {
 
   @Delete('/:id')
   @UseGuards(JwtAuthGuard)
+  @UseGuards(ApiKeyGuard)
   async deleteCategory(@Param('id') id: string, @Request() req) {
     const isAdmin = req.user?.isAdmin;
     const category = await this.categoryService.deleteCategory(id, isAdmin);
