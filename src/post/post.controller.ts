@@ -48,4 +48,13 @@ export class PostController {
   async getAllPosts(@Query('page') page = 1, @Query('limit') limit = 4) {
     return this.postService.getAllPost(page, limit);
   }
+
+  @Get('GetByCategory/:id')
+  async getPostsByCategory(
+    @Param('id') id: string,
+    @Query('page') page = 1,
+    @Query('limit') limit = 10,
+  ) {
+    return this.postService.getPostByCategory(id, page, limit);
+  }
 }
