@@ -45,7 +45,22 @@ export class PostService {
     return this.postRepository.save(updatePost);
   }
 
-  async getAllPost(): Promise<Post[]> {
-    return await this.postRepository.find();
+  async getAllPost(page: number, limit: number) {
+    const skip = (page - 1) * limit;
+    const [posts, total] = await this.postRepository.findAndCount({
+      skip,
+      take: limit,
+      relations: ['categories'],
+    });
+
+    return {
+      data: posts,
+      pagination: {
+        page,
+        limit,
+        total,
+        totalPages: Math.ceil(total / limit),
+      },
+    };
   }
 }

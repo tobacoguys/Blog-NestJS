@@ -8,6 +8,7 @@ import {
   Patch,
   Param,
   Get,
+  Query,
 } from '@nestjs/common';
 import { PostService } from './post.service';
 import { CreatePostDto } from './dto/create-post.dto';
@@ -44,8 +45,7 @@ export class PostController {
   }
 
   @Get('/getAll')
-  async getAllPost() {
-    const post = await this.postService.getAllPost();
-    return { message: 'All posts', data: post };
+  async getAllPosts(@Query('page') page = 1, @Query('limit') limit = 4) {
+    return this.postService.getAllPost(page, limit);
   }
 }
