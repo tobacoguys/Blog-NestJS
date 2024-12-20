@@ -7,6 +7,7 @@ import {
   UnauthorizedException,
   Patch,
   Param,
+  Get,
 } from '@nestjs/common';
 import { PostService } from './post.service';
 import { CreatePostDto } from './dto/create-post.dto';
@@ -40,5 +41,11 @@ export class PostController {
   ) {
     const updatePost = await this.postService.updatePost(id, updatePostDto);
     return { data: updatePost };
+  }
+
+  @Get('/getAll')
+  async getAllPost() {
+    const post = await this.postService.getAllPost();
+    return { message: 'All posts', data: post };
   }
 }

@@ -44,4 +44,8 @@ export class PostService {
     const updatePost = Object.assign(post, updatePostDto);
     return this.postRepository.save(updatePost);
   }
+
+  async getAllPost(): Promise<Post[]> {
+    return await this.postRepository.find();
+  }
 }
