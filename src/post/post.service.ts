@@ -67,4 +67,34 @@ export class PostService {
       },
     };
   }
+
+  async getPostByCategory(id: string, page: number, limit: number) {
+    const skip = (page - 1) * limit;
+
+    const category = await this.categoryRepository.findOne({
+      where: { id },
+    });
+    if (!category) {
+      throw new Error('Category not found');
+    }
+
+    const [posts, total] = await this.postRepository.findAndCount({
+      skip,
+      take: limit,
+      where: {
+        category: { id },
+      },
+      relations: ['categories'],
+    });
+
+    return {
+      data: posts,
+      pagination: {
+        page,
+        limit,
+        total,
+        totalPages: Math.ceil(total / limit),
+      },
+    };
+  }
 }
