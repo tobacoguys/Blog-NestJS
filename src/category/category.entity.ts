@@ -1,5 +1,5 @@
 import { Post } from 'src/post/post.entity';
-import { Column, Entity, ManyToMany, PrimaryGeneratedColumn } from 'typeorm';
+import { Column, Entity, OneToMany, PrimaryGeneratedColumn } from 'typeorm';
 
 @Entity('category')
 export class Category {
@@ -12,6 +12,7 @@ export class Category {
   @Column({ nullable: true })
   description: string;
 
-  @ManyToMany(() => Post, (post) => post.categories)
+  @OneToMany(() => Post, (post) => post.category)
   posts: Post[];
+  isCreator: any;
 }

@@ -1,13 +1,16 @@
 import {
   Entity,
-  Column,
   PrimaryGeneratedColumn,
-  ManyToMany,
-  JoinTable,
+  Column,
+  ManyToOne,
+  JoinColumn,
+  CreateDateColumn,
+  UpdateDateColumn,
 } from 'typeorm';
 import { Category } from '../category/category.entity';
+import User from '../user/user.entity';
 
-@Entity('post')
+@Entity()
 export class Post {
   @PrimaryGeneratedColumn()
   id: string;
@@ -15,13 +18,23 @@ export class Post {
   @Column()
   title: string;
 
-  @Column('text')
+  @Column()
   content: string;
 
-  @Column({ default: true })
+  @ManyToOne(() => Category, (category) => category.posts, { eager: true })
+  @JoinColumn({ name: 'categoryId' })
+  category: Category;
+
+  @ManyToOne(() => User, (user) => user.posts, { eager: true })
+  @JoinColumn({ name: 'userId' })
+  user: User;
+
+  @Column({ default: false })
   isPublished: boolean;
 
-  @ManyToMany(() => Category, (category) => category.posts, { eager: true })
-  @JoinTable()
-  categories: Category[];
+  @CreateDateColumn()
+  createdAt: Date;
+
+  @UpdateDateColumn()
+  updatedAt: Date;
 }

@@ -1,41 +1,40 @@
 import {
   Controller,
-  Post,
   Body,
   UseGuards,
-  Request,
-  UnauthorizedException,
   Patch,
   Param,
   Get,
   Query,
+  Post,
+  Req,
+  UnauthorizedException,
 } from '@nestjs/common';
 import { PostService } from './post.service';
-import { CreatePostDto } from './dto/create-post.dto';
 import { JwtAuthGuard } from 'src/auth/guard/jwt-auth.guard';
-import { ApiKeyGuard } from 'src/auth/guard/api-key.guard';
 import { UpdatePostDto } from './dto/update-post.dto';
 
 @Controller('post')
 export class PostController {
   constructor(private readonly postService: PostService) {}
-
-  @Post('/create')
+  @Post('create')
   @UseGuards(JwtAuthGuard)
-  @UseGuards(ApiKeyGuard)
-  async createPost(@Request() req, @Body() createPostDto: CreatePostDto) {
+  async createPost(
+    @Req() req,
+    @Body('title') title: string,
+    @Body('content') content: string,
+    @Body('categoryId') categoryId: string,
+  ) {
     const user = req.user;
 
     if (!user || !user.isCreator) {
       throw new UnauthorizedException('Access denied. Creator only.');
     }
-    const post = await this.postService.createPost(createPostDto);
-    return { message: 'Post created successfully', data: post };
+    const userId = req.user.id;
+    return this.postService.createPost(userId, title, content, categoryId);
   }
-
   @Patch('/:id')
   @UseGuards(JwtAuthGuard)
-  @UseGuards(ApiKeyGuard)
   async updatePost(
     @Param('id') id: string,
     @Body() updatePostDto: UpdatePostDto,

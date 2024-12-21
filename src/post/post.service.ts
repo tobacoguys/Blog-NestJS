@@ -3,7 +3,6 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { Post } from './post.entity';
 import { Category } from '../category/category.entity';
-import { CreatePostDto } from './dto/create-post.dto';
 import { UpdatePostDto } from './dto/update-post.dto';
 
 @Injectable()
@@ -12,26 +11,31 @@ export class PostService {
     @InjectRepository(Post) private readonly postRepository: Repository<Post>,
     @InjectRepository(Category)
     private readonly categoryRepository: Repository<Category>,
+    @InjectRepository(Category)
+    private readonly userRepository: Repository<Category>,
   ) {}
 
-  async createPost(createPostDto: CreatePostDto): Promise<Post> {
-    const { title, content, categoryIds } = createPostDto;
-
-    let categories: Category[] = [];
-    if (categoryIds && categoryIds.length > 0) {
-      categories = await this.categoryRepository.findByIds(categoryIds);
-      if (categories.length !== categoryIds.length) {
-        throw new NotFoundException('One or more categories not found');
-      }
+  async createPost(
+    userId: string,
+    title: string,
+    content: string,
+    categoryId: string,
+  ) {
+    const category = await this.categoryRepository.findOne({
+      where: { id: categoryId },
+    });
+    if (!category) {
+      throw new NotFoundException('Category not found.');
     }
 
-    const post = this.postRepository.create({
+    const newPost = this.postRepository.create({
       title,
       content,
-      categories,
+      category,
+      isPublished: true,
     });
 
-    return await this.postRepository.save(post);
+    return this.postRepository.save(newPost);
   }
 
   async updatePost(id: string, updatePostDto: UpdatePostDto): Promise<Post> {
