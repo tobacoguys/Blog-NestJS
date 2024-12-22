@@ -1,4 +1,8 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import {
+  Injectable,
+  NotFoundException,
+  UnauthorizedException,
+} from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { Post } from './post.entity';
@@ -54,7 +58,7 @@ export class PostService {
     const [posts, total] = await this.postRepository.findAndCount({
       skip,
       take: limit,
-      relations: ['categories'],
+      relations: ['category'],
     });
 
     return {
@@ -84,7 +88,7 @@ export class PostService {
       where: {
         category: { id },
       },
-      relations: ['categories'],
+      relations: ['category'],
     });
 
     return {
@@ -96,5 +100,24 @@ export class PostService {
         totalPages: Math.ceil(total / limit),
       },
     };
+  }
+
+  async deletePost(
+    id: string,
+    isCreator: boolean,
+  ): Promise<{ message: string }> {
+    if (!isCreator) {
+      throw new UnauthorizedException('Access denied. Creator only.');
+    }
+
+    const post = await this.postRepository.findOne({ where: { id } });
+
+    if (!post) {
+      throw new NotFoundException('Category not found');
+    }
+
+    await this.postRepository.remove(post);
+
+    return { message: 'Post deleted successfully' };
   }
 }

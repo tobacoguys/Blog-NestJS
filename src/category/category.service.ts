@@ -57,7 +57,7 @@ export class CategoryService {
     isCreator: boolean,
   ): Promise<{ message: string }> {
     if (!isCreator) {
-      throw new UnauthorizedException('Access denied. Admin only.');
+      throw new UnauthorizedException('Access denied. Creator only.');
     }
 
     const category = await this.categoryRepository.findOne({ where: { id } });

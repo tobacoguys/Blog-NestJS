@@ -9,6 +9,8 @@ import {
   Post,
   Req,
   UnauthorizedException,
+  Delete,
+  Request,
 } from '@nestjs/common';
 import { PostService } from './post.service';
 import { JwtAuthGuard } from 'src/auth/guard/jwt-auth.guard';
@@ -55,5 +57,13 @@ export class PostController {
     @Query('limit') limit = 10,
   ) {
     return this.postService.getPostByCategory(id, page, limit);
+  }
+
+  @Delete('/:id')
+  @UseGuards(JwtAuthGuard)
+  async deleteCategory(@Param('id') id: string, @Request() req) {
+    const isCreator = req.user?.isCreator;
+    const post = await this.postService.deletePost(id, isCreator);
+    return post;
   }
 }
