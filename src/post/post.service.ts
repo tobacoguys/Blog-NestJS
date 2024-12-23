@@ -102,6 +102,16 @@ export class PostService {
     };
   }
 
+  async getPostById(id: string): Promise<Post> {
+    const post = await this.postRepository.findOne({ where: { id } });
+
+    if (!post) {
+      throw new NotFoundException('Post not found');
+    }
+
+    return post;
+  }
+
   async deletePost(
     id: string,
     isCreator: boolean,

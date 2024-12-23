@@ -59,6 +59,12 @@ export class PostController {
     return this.postService.getPostByCategory(id, page, limit);
   }
 
+  @Get('/:id')
+  async getPostById(@Param('id') id: string) {
+    const post = await this.postService.getPostById(id);
+    return { data: post };
+  }
+
   @Delete('/:id')
   @UseGuards(JwtAuthGuard)
   async deleteCategory(@Param('id') id: string, @Request() req) {
