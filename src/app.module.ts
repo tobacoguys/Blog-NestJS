@@ -10,7 +10,6 @@ import { CategoryModule } from './category/category.module';
 import { PostModule } from './post/post.module';
 import { CommentModule } from './comment/comment.module';
 import { LikeModule } from './like/like.module';
-import { EmailModule } from './email/email.module';
 @Module({
   imports: [
     ConfigModule.forRoot({
@@ -30,7 +29,6 @@ import { EmailModule } from './email/email.module';
     PostModule,
     CommentModule,
     LikeModule,
-    EmailModule,
   ],
   controllers: [AppController],
   providers: [AppService],

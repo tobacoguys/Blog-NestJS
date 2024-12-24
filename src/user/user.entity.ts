@@ -30,6 +30,16 @@ class User {
 
   @OneToMany(() => Like, (like) => like.user)
   likes: Like[];
+
+  @Column({ nullable: true })
+  otp: string;
+
+  @Column({ nullable: true, type: 'timestamp' })
+  otpExpiry: Date;
+
+  @Column({ default: false })
+  isActive: boolean;
+
 }
 
 export default User;
