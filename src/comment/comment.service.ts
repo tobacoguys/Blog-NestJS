@@ -83,4 +83,8 @@ export class CommentService {
 
     return { message: 'Comment deleted successfully' };
   }
+
+  async getCommentByPostId(postId: string) {
+    return this.commentRepository.find({ where: { post: { id: postId } } });
+  }
 }

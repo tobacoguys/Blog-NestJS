@@ -7,6 +7,7 @@ import {
   Patch,
   Param,
   Delete,
+  Get,
 } from '@nestjs/common';
 import { CommentService } from './comment.service';
 import { CreateCommentDto } from './dto/create-comment.dto';
@@ -43,5 +44,12 @@ export class CommentController {
   async deleteComment(@Param('id') commentId: string, @Req() req) {
     const userId = req.user.id;
     return this.commentService.deleteComment(commentId, userId);
+  }
+
+  @Get('/:postId')
+  @UseGuards(JwtAuthGuard)
+  async getCommentByPostId(@Param('postId') postId: string) {
+    const comments = await this.commentService.getCommentByPostId(postId);
+    return { data: comments };
   }
 }
