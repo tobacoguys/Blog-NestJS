@@ -22,7 +22,7 @@ class User {
   @Column({ nullable: true, type: 'date' })
   birthday: Date;
 
-  @Column({ default: false })
+  @Column({ default: true })
   isCreator: boolean;
 
   @OneToMany(() => Post, (post) => post.user)
