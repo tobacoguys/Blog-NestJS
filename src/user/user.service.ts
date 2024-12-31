@@ -28,4 +28,14 @@ export class UserService {
     await this.userRepository.save(user);
     return user;
   }
+
+  async updateProfileAvatar(userId: string, avatarUrl: string) {
+    const user = await this.userRepository.findOne({ where: { id: userId } });
+    if (!user) {
+      throw new Error('User not found');
+    }
+
+    user.avatar = avatarUrl;
+    return this.userRepository.save(user);
+  }
 }
