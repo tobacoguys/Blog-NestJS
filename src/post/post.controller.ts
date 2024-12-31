@@ -11,12 +11,19 @@ import {
   UnauthorizedException,
   Delete,
   Request,
+  UseInterceptors,
+  BadRequestException,
+  UploadedFile,
+  InternalServerErrorException,
 } from '@nestjs/common';
 import { PostService } from './post.service';
 import { JwtAuthGuard } from 'src/auth/guard/jwt-auth.guard';
 import { UpdatePostDto } from './dto/update-post.dto';
 import { ApiBearerAuth, ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { CreatePostDto } from './dto/create-post.dto';
+import { FileInterceptor } from '@nestjs/platform-express';
+import { diskStorage } from 'multer';
+import { v4 as uuidv4 } from 'uuid';
 
 @Controller('post')
 export class PostController {
@@ -141,5 +148,45 @@ export class PostController {
     const isCreator = req.user?.isCreator;
     const post = await this.postService.deletePost(id, isCreator);
     return post;
+  }
+
+  @Patch('/:id/upload-image')
+  @UseGuards(JwtAuthGuard)
+  @UseInterceptors(
+    FileInterceptor('image', {
+      storage: diskStorage({
+        destination: './uploads/posts',
+        filename: (req, file, callback) => {
+          const filename = `${uuidv4()}-${file.originalname}`;
+          callback(null, filename);
+        },
+      }),
+      fileFilter: (req, file, callback) => {
+        if (!file.mimetype.match(/\/(jpg|jpeg|png|gif)$/)) {
+          return callback(new BadRequestException('Only image files are allowed!'), false);
+        }
+        callback(null, true);
+      },
+    }),
+  )
+  async uploadImage(@Param('id') id: string, @UploadedFile() file, @Request() req) {
+    if (!file) {
+      throw new BadRequestException('No file uploaded');
+    }
+
+    const imageUrl = `/uploads/posts/${file.filename}`;
+
+    const isCreator = req.user?.isCreator;
+    const updatedImg = await this.postService.updatePostImage(id, imageUrl, isCreator);
+    if (!updatedImg) {
+      throw new InternalServerErrorException('Failed to upload image');
+    }
+
+    return {
+      message: 'Image uploaded successfully',
+      data: {
+        data: updatedImg,
+      },
+    };
   }
 }

@@ -23,6 +23,9 @@ export class Post {
   @Column()
   content: string;
 
+  @Column({ nullable: true })
+  image: string;
+
   @ManyToOne(() => Category, (category) => category.posts, { eager: true })
   @JoinColumn({ name: 'categoryId' })
   category: Category;

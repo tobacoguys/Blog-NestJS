@@ -1,4 +1,4 @@
-import { Body, Controller, Patch, Request, UploadedFile, UseGuards, UseInterceptors } from '@nestjs/common';
+import { BadRequestException, Body, Controller, Patch, Request, UploadedFile, UseGuards, UseInterceptors } from '@nestjs/common';
 import { UserService } from './user.service';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { JwtAuthGuard } from 'src/auth/guard/jwt-auth.guard';
@@ -33,6 +33,16 @@ export class UserController {
     return { message: 'Profile updated successfully', data: updatedUser };
   }
 
+  @ApiTags('User')
+  @ApiBearerAuth('token')
+  @ApiOperation({
+    summary: 'Upload user avatar',
+    description: 'Upload a user avatar with JWT authentication.',
+  })
+  @ApiResponse({
+    status: 200,
+    description: 'Avatar uploaded successfully.',
+  })
   @Patch('/profile/avatar')
   @UseGuards(JwtAuthGuard)
   @UseInterceptors(
@@ -44,6 +54,12 @@ export class UserController {
           callback(null, fileName);
         },
       }),
+      fileFilter: (req, file, callback) => {
+        if (!file.mimetype.match(/\/(jpg|jpeg|png|gif)$/)) {
+          return callback(new BadRequestException('Only image files are allowed!'), false);
+        }
+        callback(null, true);
+      },
     }),
   )
   async uploadAvatar(@Request() req, @UploadedFile() file: Express.Multer.File) {

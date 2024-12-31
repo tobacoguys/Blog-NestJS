@@ -130,4 +130,19 @@ export class PostService {
 
     return { message: 'Post deleted successfully' };
   }
+
+  async updatePostImage(id: string, imageUrl: string, isCreator: boolean) {
+    if (!isCreator) {
+      throw new UnauthorizedException('Access denied. Creator only.');
+    }
+    
+    const post = await this.postRepository.findOne({ where: { id } });
+
+    if (!post) {
+      throw new NotFoundException('Post not found');
+    }
+
+    post.image = imageUrl; 
+    return this.postRepository.save(post);
+  }
 }
