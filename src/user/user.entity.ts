@@ -22,6 +22,9 @@ class User {
   @Column({ nullable: true, type: 'date' })
   birthday: Date;
 
+  @Column({ nullable: true })
+  avatar: string;
+
   @Column({ default: true })
   isCreator: boolean;
 

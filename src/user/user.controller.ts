@@ -8,7 +8,7 @@ import { ApiBearerAuth, ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagg
 export class UserController {
   constructor(private readonly userService: UserService) {}
 
-  @ApiTags('Users')
+  @ApiTags('User')
   @ApiBearerAuth('token')
   @ApiOperation({
     summary: 'Update user profile',
@@ -17,6 +17,7 @@ export class UserController {
   @ApiResponse({
     status: 200,
     description: 'Profile updated successfully.',
+    type: UpdateUserDto
   })
   @Patch('/profile')
   @UseGuards(JwtAuthGuard)

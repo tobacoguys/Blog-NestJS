@@ -15,11 +15,24 @@ import {
 import { PostService } from './post.service';
 import { JwtAuthGuard } from 'src/auth/guard/jwt-auth.guard';
 import { UpdatePostDto } from './dto/update-post.dto';
+import { ApiBearerAuth, ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
+import { CreatePostDto } from './dto/create-post.dto';
 
 @Controller('post')
 export class PostController {
   constructor(private readonly postService: PostService) {}
 
+  @ApiTags('Post')
+  @ApiBearerAuth('token')
+  @ApiOperation({
+    summary: 'Create a new post',
+    description: 'Allows a creator to create a new post.',
+  })
+  @ApiResponse({
+    status: 201,
+    description: 'Post created successfully.',
+    type: CreatePostDto
+  })
   @Post('create')
   @UseGuards(JwtAuthGuard)
   async createPost(
@@ -37,6 +50,17 @@ export class PostController {
     return this.postService.createPost(userId, title, content, categoryId);
   }
 
+  @ApiTags('Post')
+  @ApiBearerAuth('token')
+  @ApiOperation({
+    summary: 'Update a post',
+    description: 'Allows a creator to update an existing post by ID.',
+  })
+  @ApiResponse({
+    status: 200,
+    description: 'Post updated successfully.',
+    type: UpdatePostDto,
+  })
   @Patch('/:id')
   @UseGuards(JwtAuthGuard)
   async updatePost(
@@ -47,11 +71,33 @@ export class PostController {
     return { data: updatePost };
   }
 
+  @ApiTags('Post')
+  @ApiBearerAuth('')
+  @ApiOperation({
+    summary: 'Get all posts',
+    description: 'Fetches a paginated list of all posts.',
+  })
+  @ApiResponse({
+    status: 200,
+    description: 'All posts',
+    type: CreatePostDto,
+  })
   @Get('/getAll')
   async getAllPosts(@Query('page') page = 1, @Query('limit') limit = 4) {
     return this.postService.getAllPost(page, limit);
   }
 
+  @ApiTags('Post')
+  @ApiBearerAuth('')
+  @ApiOperation({
+    summary: 'Get posts by category',
+    description: 'Fetches posts belonging to a specific category.',
+  })
+  @ApiResponse({
+    status: 200,
+    description: 'Posts belonging to a specific category',
+    type: CreatePostDto,
+  })
   @Get('GetByCategory/:id')
   async getPostsByCategory(
     @Param('id') id: string,
@@ -61,12 +107,34 @@ export class PostController {
     return this.postService.getPostByCategory(id, page, limit);
   }
 
+  @ApiTags('Post')
+  @ApiBearerAuth('')
+  @ApiOperation({
+    summary: 'Get a post by ID',
+    description: 'Fetches the details of a single post by its ID.',
+  })
+  @ApiResponse({
+    status: 200,
+    description: 'Post details',
+    type: CreatePostDto,
+  })
   @Get('/:id')
   async getPostById(@Param('id') id: string) {
     const post = await this.postService.getPostById(id);
     return { data: post };
   }
 
+  @ApiTags('Post')
+  @ApiBearerAuth('token')
+  @ApiOperation({
+    summary: 'Delete a post',
+    description: 'Allows a creator to delete a post by ID.',
+  })
+  @ApiResponse({
+    status: 200,
+    description: 'The post was deleted successfully',
+    type: CreatePostDto,
+  })
   @Delete('/:id')
   @UseGuards(JwtAuthGuard)
   async deleteCategory(@Param('id') id: string, @Request() req) {
