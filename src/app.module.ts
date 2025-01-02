@@ -10,6 +10,7 @@ import { CategoryModule } from './category/category.module';
 import { PostModule } from './post/post.module';
 import { CommentModule } from './comment/comment.module';
 import { LikeModule } from './like/like.module';
+import { WalletModule } from './wallet/wallet.module';
 
 @Module({
   imports: [
@@ -30,6 +31,7 @@ import { LikeModule } from './like/like.module';
     PostModule,
     CommentModule,
     LikeModule,
+    WalletModule,
   ],
   controllers: [AppController],
   providers: [AppService],
