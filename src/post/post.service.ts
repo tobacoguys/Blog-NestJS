@@ -53,6 +53,7 @@ export class PostService {
       ...savedPost,
       author: user.username,
       avatar: user.avatar,
+      userId
     };
   }
 

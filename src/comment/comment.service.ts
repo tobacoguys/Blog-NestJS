@@ -18,17 +18,26 @@ export class CommentService {
     private readonly commentRepository: Repository<Comment>,
     @InjectRepository(Post)
     private readonly postRepository: Repository<Post>,
+    @InjectRepository(User)
+    private readonly userRepository: Repository<User>,
   ) {}
 
   async createComment(
     createCommentDto: CreateCommentDto,
     userId: string,
-  ): Promise<Comment> {
+  ) {
     const { content, postId } = createCommentDto;
 
     const post = await this.postRepository.findOneBy({ id: postId });
     if (!post) {
       throw new Error('Post not found');
+    }
+
+    const user = await this.userRepository.findOne({
+      where: { id: userId },
+    });
+    if (!user) {
+      throw new NotFoundException('User not found.');
     }
 
     const comment = this.commentRepository.create({
@@ -37,7 +46,13 @@ export class CommentService {
       user: { id: userId } as User,
     });
 
-    return this.commentRepository.save(comment);
+    const savedComment = await this.commentRepository.save(comment);
+
+    return {
+      ...savedComment,
+      username: user.username,
+      avatar: user.avatar,
+    }
   }
 
   async updateComment(
