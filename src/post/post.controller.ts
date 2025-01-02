@@ -125,11 +125,6 @@ export class PostController {
     description: 'Post details',
     type: CreatePostDto,
   })
-  @Get('/:id')
-  async getPostById(@Param('id') id: string) {
-    const post = await this.postService.getPostById(id);
-    return { data: post };
-  }
 
   @ApiTags('Post')
   @ApiBearerAuth('token')
@@ -188,5 +183,10 @@ export class PostController {
         data: updatedImg,
       },
     };
+  }
+
+  @Get('/:postId')
+  async viewPost(@Param('postId') postId: string) {
+    return this.postService.getPostById(postId);
   }
 }

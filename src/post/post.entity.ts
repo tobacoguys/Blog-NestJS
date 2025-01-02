@@ -37,6 +37,9 @@ export class Post {
   @OneToMany(() => Like, (like) => like.post)
   likes: Like[];
 
+  @Column({ default: 0 })
+  viewCount: number;
+
   @Column({ default: false })
   isPublished: boolean;
 

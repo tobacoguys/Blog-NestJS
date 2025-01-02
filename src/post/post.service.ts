@@ -44,6 +44,7 @@ export class PostService {
       title,
       content,
       category,
+      user,
       isPublished: true,
     });
 
@@ -117,14 +118,15 @@ export class PostService {
     };
   }
 
-  async getPostById(id: string): Promise<Post> {
+  async getPostById(id: string) {
     const post = await this.postRepository.findOne({ where: { id } });
 
     if (!post) {
       throw new NotFoundException('Post not found');
     }
 
-    return post;
+    post.viewCount += 1;
+    return this.postRepository.save(post);
   }
 
   async deletePost(
