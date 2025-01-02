@@ -34,12 +34,11 @@ export class AuthService {
       username,
       email,
       password: hashedPassword,
-      isActive: false, // Tài khoản mặc định chưa kích hoạt
+      isActive: false,
     });
 
     await this.usersRepository.save(user);
 
-    // Gửi OTP qua email
     const otp = this.generateOtp();
     const otpExpiry = new Date();
     otpExpiry.setMinutes(otpExpiry.getMinutes() + 5);
@@ -53,7 +52,6 @@ export class AuthService {
     return { message: 'Account created. Please verify your OTP sent to your email.' };
   }
 
-  // Phương thức gửi OTP qua email
   private async sendOtpEmail(email: string, otp: string): Promise<void> {
     const transporter = nodemailer.createTransport({
       host: this.configService.get<string>('EMAIL_HOST'),
@@ -83,7 +81,6 @@ export class AuthService {
       throw new UnauthorizedException('Invalid or expired OTP');
     }
 
-    // Kích hoạt tài khoản
     user.isActive = true;
     user.otp = null;
     user.otpExpiry = null;

@@ -55,5 +55,4 @@ export class AuthController {
   async login(@Body() loginDto: LoginDto): Promise<{ user: any; token: string }> {
     return await this.authService.login(loginDto);
   }
-  
 }

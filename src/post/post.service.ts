@@ -8,6 +8,7 @@ import { Repository } from 'typeorm';
 import { Post } from './post.entity';
 import { Category } from '../category/category.entity';
 import { UpdatePostDto } from './dto/update-post.dto';
+import User from 'src/user/user.entity';
 
 @Injectable()
 export class PostService {
@@ -15,8 +16,8 @@ export class PostService {
     @InjectRepository(Post) private readonly postRepository: Repository<Post>,
     @InjectRepository(Category)
     private readonly categoryRepository: Repository<Category>,
-    @InjectRepository(Category)
-    private readonly userRepository: Repository<Category>,
+    @InjectRepository(User)
+    private readonly userRepository: Repository<User>,
   ) {}
 
   async createPost(
@@ -32,6 +33,13 @@ export class PostService {
       throw new NotFoundException('Category not found.');
     }
 
+    const user = await this.userRepository.findOne({
+      where: { id: userId },
+    });
+    if (!user) {
+      throw new NotFoundException('User not found.');
+    }
+
     const newPost = this.postRepository.create({
       title,
       content,
@@ -39,7 +47,13 @@ export class PostService {
       isPublished: true,
     });
 
-    return this.postRepository.save(newPost);
+    const savedPost = await this.postRepository.save(newPost);
+
+    return {
+      ...savedPost,
+      author: user.username,
+      avatar: user.avatar,
+    };
   }
 
   async updatePost(id: string, updatePostDto: UpdatePostDto): Promise<Post> {
