@@ -18,4 +18,12 @@ export class WalletService {
     const newWallet = this.walletRepository.create({ creatorId, balance: 0 });
     return this.walletRepository.save(newWallet);
   }
+
+  async getWalletByCreatorId(creatorId: string) {
+    const wallet = await this.walletRepository.findOne({ where: { creatorId }, });
+    if (!wallet) {
+      throw new Error(`Wallet not found for creatorId: ${creatorId}`);
+    }
+    return wallet;
+  }
 }

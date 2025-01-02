@@ -1,4 +1,4 @@
-import { Controller, Post, UseGuards, Req, UnauthorizedException } from '@nestjs/common';
+import { Controller, Post, UseGuards, Req, UnauthorizedException, Param, Get } from '@nestjs/common';
 import { WalletService } from './wallet.service';
 import { JwtAuthGuard } from 'src/auth/guard/jwt-auth.guard';
 
@@ -16,5 +16,10 @@ export class WalletController {
     }
 
     return this.walletService.createWallet(user.id);
+  }
+
+  @Get(':creatorId')
+  async getWallet(@Param('creatorId') creatorId: string) {
+    return this.walletService.getWalletByCreatorId(creatorId);
   }
 }
