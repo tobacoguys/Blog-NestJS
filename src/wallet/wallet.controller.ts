@@ -1,6 +1,7 @@
 import { Controller, Post, UseGuards, Req, UnauthorizedException, Param, Get } from '@nestjs/common';
 import { WalletService } from './wallet.service';
 import { JwtAuthGuard } from 'src/auth/guard/jwt-auth.guard';
+import { ApiKeyGuard } from 'src/auth/guard/api-key.guard';
 
 @Controller('wallet')
 export class WalletController {
@@ -21,5 +22,11 @@ export class WalletController {
   @Get(':creatorId')
   async getWallet(@Param('creatorId') creatorId: string) {
     return this.walletService.getWalletByCreatorId(creatorId);
+  }
+
+  @Post('daily')
+  @UseGuards(ApiKeyGuard)
+  async calculateDailyEarnings() {
+    return this.walletService.calculateDailyEarning();
   }
 }
