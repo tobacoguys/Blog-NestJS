@@ -25,24 +25,24 @@ export class LikeService {
     if (!post) {
       throw new NotFoundException('Post not found');
     }
-
+  
     const user = await this.userRepository.findOne({ where: { id: userId } });
-
+    if (!user) {
+      throw new NotFoundException('User not found');
+    }
+  
     const existingLike = await this.likeRepository.findOne({
       where: { post: { id: postId }, user: { id: userId } },
     });
-
+  
     if (existingLike) {
       throw new BadRequestException('You have already liked this post');
     }
-
-    const like = this.likeRepository.create({
-      post,
-      user
-    });
-
+  
+    const like = this.likeRepository.create({ post, user });
     return this.likeRepository.save(like);
-  } 
+  }
+  
 
   async unlikePost(postId: string, userId: string) {
     const like = await this.likeRepository.findOne({

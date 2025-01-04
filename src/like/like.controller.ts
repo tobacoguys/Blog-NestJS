@@ -2,14 +2,16 @@ import {
   Controller,
   Post,
   Param,
-  Body,
   Delete,
   Get,
   UseGuards,
+  Req,
 } from '@nestjs/common';
 import { LikeService } from './like.service';
 import { JwtAuthGuard } from 'src/auth/guard/jwt-auth.guard';
 import { ApiBearerAuth, ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
+import { Request } from 'express';
+
 @Controller('like')
 export class LikeController {
   constructor(private readonly likeService: LikeService) {}
@@ -18,7 +20,7 @@ export class LikeController {
   @ApiBearerAuth('token')
   @ApiOperation({
     summary: 'Like a post',
-    description: 'Allows a user to like'
+    description: 'Allows a logged-in user to like a post using their token',
   })
   @ApiResponse({
     status: 200,
@@ -26,10 +28,8 @@ export class LikeController {
   })
   @Post(':postId')
   @UseGuards(JwtAuthGuard)
-  async likePost(
-    @Param('postId') postId: string,
-    @Body('userId') userId: string,
-  ) {
+  async likePost(@Param('postId') postId: string, @Req() req: Request) {
+    const userId = req['user']['id'];
     return this.likeService.likePost(postId, userId);
   }
 
@@ -47,8 +47,9 @@ export class LikeController {
   @UseGuards(JwtAuthGuard)
   async unlikePost(
     @Param('postId') postId: string,
-    @Body('userId') userId: string,
+    @Req() req: Request,
   ) {
+    const userId = req['user']['id'];
     return this.likeService.unlikePost(postId, userId);
   }
 
