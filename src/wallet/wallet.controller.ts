@@ -1,4 +1,4 @@
-import { Controller, Post, UseGuards, Req, UnauthorizedException, Param, Get } from '@nestjs/common';
+import { Controller, Post, UseGuards, Req, UnauthorizedException, Param, Get, Body } from '@nestjs/common';
 import { WalletService } from './wallet.service';
 import { JwtAuthGuard } from 'src/auth/guard/jwt-auth.guard';
 import { ApiKeyGuard } from 'src/auth/guard/api-key.guard';
@@ -28,5 +28,10 @@ export class WalletController {
   @UseGuards(ApiKeyGuard)
   async calculateDailyEarnings() {
     return this.walletService.calculateDailyEarning();
+  }
+
+  @Post('/withdrawals')
+  async createWithdrawal(@Body('creatorId') creatorId: string, @Body('amount') amount: number) {
+    return this.walletService.requestWithdrawal(creatorId, amount);
   }
 }

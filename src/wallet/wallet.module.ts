@@ -5,9 +5,10 @@ import { WalletController } from './wallet.controller';
 import { WalletService } from './wallet.service';
 import { Post } from 'src/post/post.entity';
 import { DailyEarning } from './entity/daily-earning.entity';
+import { Withdrawal } from './entity/withdrawals.entity';
 
 @Module({
-    imports: [TypeOrmModule.forFeature([Wallet, Post, DailyEarning])],
+    imports: [TypeOrmModule.forFeature([Wallet, Post, DailyEarning, Withdrawal])],
     controllers: [WalletController], 
     providers: [WalletService],
 })

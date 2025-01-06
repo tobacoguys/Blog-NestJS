@@ -5,6 +5,7 @@ import { Wallet } from './entity/wallet.entity';
 import { Post } from 'src/post/post.entity';
 import { DailyEarning } from './entity/daily-earning.entity';
 import { Cron, CronExpression } from '@nestjs/schedule';
+import { Withdrawal } from './entity/withdrawals.entity';
 
 @Injectable()
 export class WalletService {
@@ -15,7 +16,10 @@ export class WalletService {
     private dailyEarningRepository: Repository<DailyEarning>,
     @InjectRepository(Post)
     private postRepository: Repository<Post>,
+    @InjectRepository(Withdrawal)
+    private withdrawalRepository: Repository<Withdrawal>,
   ) {}
+
   async createWallet(creatorId: string) {
     const existingWallet = await this.walletRepository.findOne({ where: { creatorId } });
     if (existingWallet) {
@@ -27,7 +31,7 @@ export class WalletService {
   }
 
   async getWalletByCreatorId(creatorId: string) {
-    const wallet = await this.walletRepository.findOne({ where: { creatorId }, });
+    const wallet = await this.walletRepository.findOne({ where: { creatorId } });
     if (!wallet) {
       throw new Error(`Wallet not found for creatorId: ${creatorId}`);
     }
@@ -87,7 +91,7 @@ export class WalletService {
           viewsToday: dailyEarning.viewsToday,
           earningToday: dailyEarning.earningToday,
           totalBalance: wallet.balance,
-          postId: post.id
+          postId: post.id,
         });
       } else {
         console.warn(`Wallet not found for creator ID ${post.user.id}`);
@@ -102,5 +106,35 @@ export class WalletService {
       message: 'Daily earnings calculated successfully.',
       result,
     };
+  }
+
+  async requestWithdrawal(creatorId: string, amount: number) {
+    if (amount <= 0) {
+      throw new BadRequestException('Invalid withdrawal amount');
+    }
+
+    const wallet = await this.walletRepository.findOne({ where: { creatorId } });
+
+    if (!wallet) {
+      throw new BadRequestException('Wallet not found');
+    }
+
+    if (amount > wallet.balance) {
+      throw new BadRequestException('Insufficient balance');
+    }
+
+    const withdrawal = this.withdrawalRepository.create({
+      creatorId,
+      amount,
+      status: 'PENDING',
+      createdAt: new Date(),
+    });
+
+    wallet.balance -= amount;
+
+    await this.walletRepository.save(wallet);
+    await this.withdrawalRepository.save(withdrawal);
+
+    return withdrawal;
   }
 }
