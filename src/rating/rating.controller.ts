@@ -29,4 +29,18 @@ export class RatingController {
     const userId = req.user.id;
     return this.ratingService.createRating(userId, postId, stars);
   }
+
+  
+  @UseGuards(JwtAuthGuard)
+  @Get('/:postId')
+  async getAverageRating(@Req() req, @Param('postId') postId: string) {
+    const user = req.user;
+
+    if (!user.isCreator) {
+      throw new UnauthorizedException('Access denied. Creator only.');
+    }
+
+    const userId = req.user.id;
+    return this.ratingService.getAverageRating(userId, postId);
+  }
 }
