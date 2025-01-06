@@ -33,7 +33,7 @@ export class WalletService {
   async getWalletByCreatorId(creatorId: string) {
     const wallet = await this.walletRepository.findOne({ where: { creatorId } });
     if (!wallet) {
-      throw new Error(`Wallet not found for creatorId: ${creatorId}`);
+      throw new BadRequestException (`Wallet not found for creatorId: ${creatorId}`);
     }
     return wallet;
   }

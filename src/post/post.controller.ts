@@ -145,6 +145,17 @@ export class PostController {
     return post;
   }
 
+  @ApiTags('Post')
+  @ApiBearerAuth('token')
+  @ApiOperation({
+    summary: 'Upload an image to a post',
+    description: 'Allows a creator to upload an image to a post by ID.',
+  })
+  @ApiResponse({
+    status: 200,
+    description: 'Image uploaded successfully',
+    type: CreatePostDto,
+  })
   @Patch('/:id/upload-image')
   @UseGuards(JwtAuthGuard)
   @UseInterceptors(
@@ -185,6 +196,17 @@ export class PostController {
     };
   }
 
+  @ApiTags('Post')
+  @ApiBearerAuth('')
+  @ApiOperation({
+    summary: 'View a post',
+    description: 'Fetches the details of a single post by its ID.',
+  })
+  @ApiResponse({
+    status: 200,
+    description: 'Post details',
+    type: CreatePostDto,
+  })
   @Get('/:postId')
   async viewPost(@Param('postId') postId: string) {
     return this.postService.getPostById(postId);

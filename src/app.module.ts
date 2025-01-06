@@ -11,6 +11,7 @@ import { PostModule } from './post/post.module';
 import { CommentModule } from './comment/comment.module';
 import { LikeModule } from './like/like.module';
 import { WalletModule } from './wallet/wallet.module';
+import { RatingModule } from './rating/rating.module';
 
 @Module({
   imports: [
@@ -32,6 +33,7 @@ import { WalletModule } from './wallet/wallet.module';
     CommentModule,
     LikeModule,
     WalletModule,
+    RatingModule,
   ],
   controllers: [AppController],
   providers: [AppService],
