@@ -172,4 +172,34 @@ export class PostService {
     post.image = imageUrl; 
     return this.postRepository.save(post);
   }
+
+  async getPostByCreator(userId: string, page: number, limit: number) {
+    const skip = (page - 1) * limit;
+
+    const user = await this.userRepository.findOne({
+      where: { id: userId, isCreator: true },
+    });
+    if (!user) {
+      throw new UnauthorizedException('User is not a creator or not found.');
+    }
+
+    const [posts, total] = await this.postRepository.findAndCount({
+      skip,
+      take: limit,
+      where: {
+        user: { id: userId },
+      },
+      relations: ['category'],
+    });
+
+    return {
+      data: posts,
+      pagination: {
+        page,
+        limit,
+        total,
+        totalPages: Math.ceil(total / limit),
+      },
+    };
+  }
 }

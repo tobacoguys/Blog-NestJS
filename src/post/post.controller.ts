@@ -199,4 +199,25 @@ export class PostController {
   async viewPost(@Param('postId') postId: string) {
     return this.postService.getPostById(postId);
   }
+
+  @ApiTags('Post')
+  @ApiBearerAuth('token')
+  @ApiOperation({
+    summary: 'Get posts by user',
+    description: 'Fetches posts created by a specific user who is a creator.',
+  })
+  @ApiResponse({
+    status: 200,
+    description: 'Posts created by the user',
+    type: CreatePostDto,
+  })
+  @Get('by-user/:userId')
+  @UseGuards(JwtAuthGuard)
+  async getPostByCreator(
+    @Param('userId') userId: string,
+    @Query('page') page = 1,
+    @Query('limit') limit = 4,
+  ) {
+    return this.postService.getPostByCreator(userId, page, limit);
+  }
 }
