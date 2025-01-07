@@ -102,4 +102,46 @@ export class CommentService {
   async getCommentByPostId(postId: string) {
     return this.commentRepository.find({ where: { post: { id: postId } } });
   }
+
+  async replyToComment(
+    createCommentDto: CreateCommentDto,
+    userId: string,
+    parentId: string,
+  ) {
+    const { content, postId } = createCommentDto;
+
+    const post = await this.postRepository.findOneBy({ id: postId });
+    if (!post) {
+      throw new NotFoundException('Post not found');
+    }
+
+    const user = await this.userRepository.findOne({
+      where: { id: userId },
+    });
+    if (!user) {
+      throw new NotFoundException('User not found.');
+    }
+
+    const parentComment = await this.commentRepository.findOne({
+      where: { id: parentId, post: { id: postId } },
+    });
+    if (!parentComment) {
+      throw new NotFoundException('Parent comment not found in post.');
+    }
+
+    const reply = this.commentRepository.create({
+      content,
+      post,
+      user: { id: userId } as User,
+      parent: parentComment,
+    });
+
+    const savedReply = await this.commentRepository.save(reply);
+
+    return {
+      ...savedReply,
+      username: user.username,
+      avatar: user.avatar,
+    };
+  }
 }

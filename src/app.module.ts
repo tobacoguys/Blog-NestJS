@@ -23,6 +23,8 @@ import { RatingModule } from './rating/rating.module';
         DB_PASSWORD: Joi.string().required(),
         DB_DATABASE: Joi.string().required(),
         PORT: Joi.number(),
+        isGlobal: true, 
+        envFilePath: '.env', 
       }),
     }),
     DatabaseModule,

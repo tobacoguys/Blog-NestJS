@@ -3,6 +3,7 @@ import {
   PrimaryGeneratedColumn,
   Column,
   ManyToOne,
+  OneToMany,
   JoinColumn,
   CreateDateColumn,
 } from 'typeorm';
@@ -24,6 +25,13 @@ export class Comment {
   @ManyToOne(() => Post, (post) => post.id, { eager: true })
   @JoinColumn({ name: 'postId' })
   post: Post;
+
+  @ManyToOne(() => Comment, (comment) => comment.replies)
+  @JoinColumn({ name: 'parentId' })
+  parent: Comment;
+
+  @OneToMany(() => Comment, (comment) => comment.parent)
+  replies: Comment[];
 
   @CreateDateColumn()
   createdAt: Date;

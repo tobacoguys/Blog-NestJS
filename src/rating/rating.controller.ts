@@ -30,7 +30,17 @@ export class RatingController {
     return this.ratingService.createRating(userId, postId, stars);
   }
 
-  
+  @ApiTags('Rating')
+  @ApiBearerAuth('token')
+  @ApiOperation({
+    summary: 'Get average rating',
+    description: 'Allows a user to get the average rating for a post.',
+  })
+  @ApiResponse({
+    status: 200,
+    description: 'Get average rating successfully.',
+    type: Number,
+  })
   @UseGuards(JwtAuthGuard)
   @Get('/:postId')
   async getAverageRating(@Req() req, @Param('postId') postId: string) {

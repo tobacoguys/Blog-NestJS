@@ -95,4 +95,26 @@ export class CommentController {
     const comments = await this.commentService.getCommentByPostId(postId);
     return { data: comments };
   }
+
+  @ApiTags('Comment')
+  @ApiBearerAuth('token')
+  @ApiOperation({
+    summary: 'Reply to a comment',
+    description: 'Allows a user to reply to a comment.',
+  })
+  @ApiResponse({
+    status: 201,
+    description: 'Reply created successfully.',
+    type: CreateCommentDto,
+  })
+  @UseGuards(JwtAuthGuard)
+  @Post('/reply/:parentId')
+  async replyToComment(
+    @Param('parentId') parentId: string,
+    @Body() createCommentDto: CreateCommentDto,
+    @Req() req,
+  ) {
+    const userId = req.user.id;
+    return this.commentService.replyToComment(createCommentDto, userId, parentId);
+  }
 }
