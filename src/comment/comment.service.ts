@@ -30,7 +30,7 @@ export class CommentService {
 
     const post = await this.postRepository.findOneBy({ id: postId });
     if (!post) {
-      throw new Error('Post not found');
+      throw new NotFoundException('Post not found');
     }
 
     const user = await this.userRepository.findOne({
@@ -100,7 +100,25 @@ export class CommentService {
   }
 
   async getCommentByPostId(postId: string) {
-    return this.commentRepository.find({ where: { post: { id: postId } } });
+    const comments = await this.commentRepository.find({
+      where: { post: { id: postId } },
+      relations: ['user', 'replies', 'replies.user'],
+    });
+
+    if (!comments.length) {
+      throw new NotFoundException('Post not found');
+    }
+
+    return comments.map(comment => ({
+      ...comment,
+      replies: comment.replies.map(reply => ({
+        ...reply,
+        username: reply.user.username,
+        avatar: reply.user.avatar,
+      })),
+      username: comment.user.username,
+      avatar: comment.user.avatar,
+    }));
   }
 
   async replyToComment(
