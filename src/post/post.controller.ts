@@ -113,19 +113,7 @@ export class PostController {
   ) {
     return this.postService.getPostByCategory(id, page, limit);
   }
-
-  @ApiTags('Post')
-  @ApiBearerAuth('')
-  @ApiOperation({
-    summary: 'Get a post by ID',
-    description: 'Fetches the details of a single post by its ID.',
-  })
-  @ApiResponse({
-    status: 200,
-    description: 'Post details',
-    type: CreatePostDto,
-  })
-
+  
   @ApiTags('Post')
   @ApiBearerAuth('token')
   @ApiOperation({

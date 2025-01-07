@@ -53,4 +53,14 @@ export class RatingService {
     const totalStars = ratings.reduce((sum, rating) => sum + rating.stars, 0);
     return totalStars / ratings.length;
   }
+
+  async getRatingById(id: string) {
+    const rating = await this.ratingRepository.findOne({ where: { id } });
+
+    if (!rating) {
+      throw new NotFoundException('Rating not found');
+    }
+
+    return rating;
+  }
 }
