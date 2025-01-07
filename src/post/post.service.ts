@@ -9,6 +9,8 @@ import { Post } from './post.entity';
 import { Category } from '../category/category.entity';
 import { UpdatePostDto } from './dto/update-post.dto';
 import User from 'src/user/user.entity';
+import { Comment } from 'src/comment/comment.entity';
+import { Rating } from 'src/rating/rating.entity';
 
 @Injectable()
 export class PostService {
@@ -18,6 +20,10 @@ export class PostService {
     private readonly categoryRepository: Repository<Category>,
     @InjectRepository(User)
     private readonly userRepository: Repository<User>,
+    @InjectRepository(Comment)
+    private readonly commentRepository: Repository<Comment>,
+    @InjectRepository(Rating)
+    private readonly ratingRepository: Repository<Rating>,
   ) {}
 
   async createPost(
@@ -140,8 +146,12 @@ export class PostService {
     const post = await this.postRepository.findOne({ where: { id } });
 
     if (!post) {
-      throw new NotFoundException('Category not found');
+      throw new NotFoundException('Post not found');
     }
+
+    await this.ratingRepository.delete({ post });
+
+    await this.commentRepository.delete({ post });
 
     await this.postRepository.remove(post);
 
