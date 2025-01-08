@@ -239,25 +239,29 @@ export class PostController {
   @UseGuards(JwtAuthGuard)
   async downloadPost(@Param('postId') postId: string, @Res() res: Response) {
     const post = await this.postService.findOneById(postId);
-
+  
     if (!post) {
       throw new NotFoundException('Post not found');
     }
-
-    // Create PDF
+  
     const doc = new PDFDocument();
+    const sanitizedTitle = post.title.replace(/[^a-z0-9]/gi, '_').toLowerCase();
+  
+    const fontPath = './src/assets/fonts/times.TTF';
     res.setHeader('Content-Type', 'application/pdf');
-    res.setHeader('Content-Disposition', `attachment; filename=${post.title}.pdf`);
-    
+    res.setHeader('Content-Disposition', `attachment; filename="${sanitizedTitle}.pdf"`);
+  
     doc.pipe(res);
-
-    // Write content to PDF
+  
+    doc.font(fontPath);
+  
     doc.fontSize(20).text(post.title, { align: 'center' });
     doc.moveDown();
     doc.fontSize(12).text(`Author: ${post.user.username}`, { align: 'left' });
     doc.moveDown();
-    doc.fontSize(14).text(post.content, { align: 'justify' });
-
+    doc.fontSize(14).text(post.content, { align: 'justify', lineGap: 6 });
+  
     doc.end();
   }
+  
 }

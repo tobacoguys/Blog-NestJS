@@ -102,18 +102,26 @@ export class CommentService {
   async getCommentByPostId(postId: string) {
     const rootComments = await this.commentRepository.find({
       where: { post: { id: postId }, parent: null },
-      relations: ['user'],
+      relations: ['user', 'replies', 'replies.user', 'replies.replies', 'replies.replies.replies'],
     });
   
-    const formattedComments = await Promise.all(
-      rootComments.map(async (comment) => this.formatCommentWithReplies(comment))
+    const formattedComments = rootComments.map(comment => this.formatComment(comment));
+  
+    const commentIdsInReplies = new Set(
+      formattedComments.flatMap(comment =>
+        this.collectReplyIds(comment.replies)
+      )
     );
   
-    return { data: formattedComments };
-  }
+    const filteredComments = formattedComments.filter(
+      comment => !commentIdsInReplies.has(comment.id)
+    );
   
-  private async formatCommentWithReplies(comment: Comment): Promise<any> {
-    const formattedComment = {
+    return { data: filteredComments };
+  }
+
+  private formatComment(comment: Comment): any {
+    return {
       id: comment.id,
       content: comment.content,
       createdAt: comment.createdAt,
@@ -123,25 +131,16 @@ export class CommentService {
         email: comment.user.email,
         avatar: comment.user.avatar,
       },
-      replies: [],
-      post: comment.post ? { id: comment.post.id, title: comment.post.title } : undefined,
+      replies: comment.replies ? comment.replies.map(reply => this.formatComment(reply)) : [],
+      post: {
+        id: comment.post.id,
+        title: comment.post.title,
+      },
     };
-    const replies = await this.commentRepository.find({
-      where: { parent: { id: comment.id } },
-      relations: ['user'],
-    });
-  
-    if (replies.length > 0) {
-      formattedComment.replies = await Promise.all(
-        replies.map(async (reply) => this.formatCommentWithReplies(reply))
-      );
-    }
-  
-    return formattedComment;
   }
-  
-  
-  
+  private collectReplyIds(replies: any[]): string[] {
+    return replies.flatMap(reply => [reply.id, ...this.collectReplyIds(reply.replies)]);
+  }
   
   async replyToComment(
     createCommentDto: CreateCommentDto,
