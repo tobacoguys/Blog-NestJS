@@ -102,16 +102,17 @@ export class CommentService {
   async getCommentByPostId(postId: string) {
     const rootComments = await this.commentRepository.find({
       where: { post: { id: postId }, parent: null },
-      relations: ['user', 'replies', 'replies.user'],
+      relations: ['user', 'replies', 'replies.user', 'replies.replies'],
     });
   
-    const comments = rootComments.map(comment => ({
+    const formattedComments = rootComments.map(comment => ({
       id: comment.id,
       content: comment.content,
       createdAt: comment.createdAt,
       user: {
         id: comment.user.id,
         username: comment.user.username,
+        email: comment.user.email,
         avatar: comment.user.avatar,
       },
       replies: this.mapReplies(comment.replies),
@@ -122,16 +123,16 @@ export class CommentService {
     }));
   
     const commentIdsInReplies = new Set(
-      comments.flatMap(comment =>
+      formattedComments.flatMap(comment =>
         this.collectReplyIds(comment.replies)
       )
     );
   
-    const filteredComments = comments.filter(
+    const filteredComments = formattedComments.filter(
       comment => !commentIdsInReplies.has(comment.id)
     );
   
-    return filteredComments;
+    return { data: filteredComments };
   }
   
   private collectReplyIds(replies: any[]): string[] {
@@ -146,14 +147,13 @@ export class CommentService {
       user: {
         id: reply.user.id,
         username: reply.user.username,
+        email: reply.user.email,
         avatar: reply.user.avatar,
       },
-      replies: reply.replies ? this.mapReplies(reply.replies) : [],
+      replies: reply.replies ? this.mapReplies(reply.replies) : [], // Đệ quy nếu có replies con
     }));
   }
   
-  
-
   async replyToComment(
     createCommentDto: CreateCommentDto,
     userId: string,
