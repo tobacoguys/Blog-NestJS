@@ -83,7 +83,7 @@ export class CommentService {
   ): Promise<{ message: string }> {
     const comment = await this.commentRepository.findOne({
       where: { id: commentId },
-      relations: ['user'],
+      relations: ['user', 'replies', 'replies.replies'],
     });
 
     if (!comment) {
@@ -94,9 +94,22 @@ export class CommentService {
       throw new ForbiddenException('You can only delete your own comments');
     }
 
+    if (comment.replies && comment.replies.length > 0) {
+      await this.deleteReplies(comment.replies);
+    }
+
     await this.commentRepository.remove(comment);
 
-    return { message: 'Comment deleted successfully' };
+    return { message: 'Comment and replies deleted successfully' };
+  }
+
+  private async deleteReplies(replies: Comment[]) {
+    for (const reply of replies) {
+      if (reply.replies && reply.replies.length > 0) {
+        await this.deleteReplies(reply.replies);
+      }
+      await this.commentRepository.remove(reply);
+    }
   }
 
   async getCommentByPostId(postId: string) {
