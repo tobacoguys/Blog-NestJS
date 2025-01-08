@@ -102,23 +102,41 @@ export class CommentService {
 
   async getCommentByPostId(postId: string) {
     const comments = await this.commentRepository.find({
-      where: { post: { id: postId } },
+      where: { post: { id: postId }, parent: null },
       relations: ['user', 'replies', 'replies.user'],
     });
 
     if (!comments.length) {
       throw new NotFoundException('Post not found');
     }
+    const post = await this.postRepository.find({
+      where: { id: postId },
+    })
 
-    return comments.map(comment => ({
-      ...comment,
+    const commentsWithReplies = comments.filter(comment => comment.replies.length > 0);
+
+    return commentsWithReplies.map(comment => ({
+      id: comment.id,
+      content: comment.content,
+      createdAt: comment.createdAt,
+      user: {
+        id: comment.user.id,
+        username: comment.user.username,
+        email: comment.user.email,
+        avatar: comment.user.avatar,
+      },
       replies: comment.replies.map(reply => ({
-        ...reply,
-        username: reply.user.username,
-        avatar: reply.user.avatar,
+        id: reply.id,
+        content: reply.content,
+        createdAt: reply.createdAt,
+        user: {
+          id: reply.user.id,
+          username: reply.user.username,
+          email: reply.user.email,
+          avatar: reply.user.avatar,
+        },
       })),
-      username: comment.user.username,
-      avatar: comment.user.avatar,
+      post
     }));
   }
 
