@@ -108,13 +108,14 @@ export class CommentController {
     type: CreateCommentDto,
   })
   @UseGuards(JwtAuthGuard)
-  @Post('/reply/:parentId')
+  @Post('/reply/:postId/:parentId')
   async replyToComment(
+    @Param('postId') postId: string,
     @Param('parentId') parentId: string,
     @Body() createCommentDto: CreateCommentDto,
     @Req() req,
   ) {
     const userId = req.user.id;
-    return this.commentService.replyToComment(createCommentDto, userId, parentId);
+    return this.commentService.replyToComment(createCommentDto, userId, postId, parentId);
   }
 }

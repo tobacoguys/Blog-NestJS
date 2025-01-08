@@ -157,9 +157,10 @@ export class CommentService {
   async replyToComment(
     createCommentDto: CreateCommentDto,
     userId: string,
+    postId: string,
     parentId: string,
   ) {
-    const { content, postId } = createCommentDto;
+    const { content } = createCommentDto;
 
     const post = await this.postRepository.findOneBy({ id: postId });
     if (!post) {
