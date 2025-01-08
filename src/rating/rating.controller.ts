@@ -67,7 +67,8 @@ export class RatingController {
   })
   @Get('/get/:ratingId')
   @UseGuards(JwtAuthGuard)
-  async viewRating(@Param('ratingId') ratingId: string) {
-    return this.ratingService.getRatingById(ratingId);
+  async viewRating(@Req() req, @Param('ratingId') ratingId: string) {
+    const userId = req.user.id;
+    return this.ratingService.getRatingById(userId, ratingId);
   }
 }
