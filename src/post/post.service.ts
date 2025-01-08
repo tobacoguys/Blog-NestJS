@@ -202,4 +202,8 @@ export class PostService {
       },
     };
   }
+
+  async findOneById(postId: string): Promise<Post> {
+    return this.postRepository.findOne({ where: { id: postId }, relations: ['user'] });
+  }
 }

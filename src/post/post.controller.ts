@@ -15,6 +15,8 @@ import {
   BadRequestException,
   UploadedFile,
   InternalServerErrorException,
+  NotFoundException,
+  Res,
 } from '@nestjs/common';
 import { PostService } from './post.service';
 import { JwtAuthGuard } from 'src/auth/guard/jwt-auth.guard';
@@ -24,6 +26,8 @@ import { CreatePostDto } from './dto/create-post.dto';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { diskStorage } from 'multer';
 import { v4 as uuidv4 } from 'uuid';
+import * as PDFDocument from 'pdfkit';
+import { Response } from 'express';
 
 @Controller('post')
 export class PostController {
@@ -219,5 +223,41 @@ export class PostController {
     @Query('limit') limit = 4,
   ) {
     return this.postService.getPostByCreator(userId, page, limit);
+  }
+
+  @ApiTags('Post')
+  @ApiBearerAuth('token')
+  @ApiOperation({
+    summary: 'Download a post',
+    description: 'Allows a creator to download a post by ID.',
+  })
+  @ApiResponse({
+    status: 200,
+    description: 'Post downloaded successfully',
+  })
+  @Get(':postId/download')
+  @UseGuards(JwtAuthGuard)
+  async downloadPost(@Param('postId') postId: string, @Res() res: Response) {
+    const post = await this.postService.findOneById(postId);
+
+    if (!post) {
+      throw new NotFoundException('Post not found');
+    }
+
+    // Create PDF
+    const doc = new PDFDocument();
+    res.setHeader('Content-Type', 'application/pdf');
+    res.setHeader('Content-Disposition', `attachment; filename=${post.title}.pdf`);
+    
+    doc.pipe(res);
+
+    // Write content to PDF
+    doc.fontSize(20).text(post.title, { align: 'center' });
+    doc.moveDown();
+    doc.fontSize(12).text(`Author: ${post.user.username}`, { align: 'left' });
+    doc.moveDown();
+    doc.fontSize(14).text(post.content, { align: 'justify' });
+
+    doc.end();
   }
 }
