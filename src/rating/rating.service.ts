@@ -1,4 +1,4 @@
-import { Injectable, NotFoundException, BadRequestException, UnauthorizedException } from '@nestjs/common';
+import { Injectable, NotFoundException, BadRequestException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { Rating } from './rating.entity';
@@ -52,19 +52,5 @@ export class RatingService {
 
     const totalStars = ratings.reduce((sum, rating) => sum + rating.stars, 0);
     return totalStars / ratings.length;
-  }
-
-  async getRatingById(userId: string, id: string) {
-    const rating = await this.ratingRepository.findOne({ where: { id } });
-
-    if (!rating) {
-      throw new NotFoundException('Rating not found');
-    }
-
-    if (rating.userId !== userId) {
-      throw new UnauthorizedException('Access denied. You can only view your own ratings.');
-    }
-
-    return rating;
   }
 }

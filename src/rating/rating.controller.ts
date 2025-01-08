@@ -53,22 +53,4 @@ export class RatingController {
     const userId = req.user.id;
     return this.ratingService.getAverageRating(userId, postId);
   }
-
-  @ApiTags('Rating')
-  @ApiBearerAuth('token')
-  @ApiOperation({
-    summary: 'View rating',
-    description: 'Allows a user to view a rating by ID.',
-  })
-  @ApiResponse({
-    status: 200,
-    description: 'View rating successfully.',
-    type: RatingDto,
-  })
-  @Get('/get/:ratingId')
-  @UseGuards(JwtAuthGuard)
-  async viewRating(@Req() req, @Param('ratingId') ratingId: string) {
-    const userId = req.user.id;
-    return this.ratingService.getRatingById(userId, ratingId);
-  }
 }
