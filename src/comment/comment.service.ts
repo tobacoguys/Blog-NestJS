@@ -100,45 +100,59 @@ export class CommentService {
   }
 
   async getCommentByPostId(postId: string) {
-    const comments = await this.commentRepository.find({
-      where: { post: { id: postId } },
+    const rootComments = await this.commentRepository.find({
+      where: { post: { id: postId }, parent: null },
       relations: ['user', 'replies', 'replies.user'],
     });
-
-    if (!comments.length) {
-      throw new NotFoundException('No comments found for this post');
-    }
-
-    const post = await this.postRepository.find({
-      where: { id: postId },
-    })
-
-    const commentsWithReplies = comments.filter(comment => comment.replies.length > 0);
-
-    return commentsWithReplies.map(comment => ({
+  
+    const comments = rootComments.map(comment => ({
       id: comment.id,
       content: comment.content,
       createdAt: comment.createdAt,
       user: {
         id: comment.user.id,
         username: comment.user.username,
-        email: comment.user.email,
         avatar: comment.user.avatar,
       },
-      replies: comment.replies.map(reply => ({
-        id: reply.id,
-        content: reply.content,
-        createdAt: reply.createdAt,
-        user: {
-          id: reply.user.id,
-          username: reply.user.username,
-          email: reply.user.email,
-          avatar: reply.user.avatar,
-        },
-      })),
-      post
+      replies: this.mapReplies(comment.replies),
+      post: {
+        id: comment.post.id,
+        title: comment.post.title,
+      },
+    }));
+  
+    const commentIdsInReplies = new Set(
+      comments.flatMap(comment =>
+        this.collectReplyIds(comment.replies)
+      )
+    );
+  
+    const filteredComments = comments.filter(
+      comment => !commentIdsInReplies.has(comment.id)
+    );
+  
+    return filteredComments;
+  }
+  
+  private collectReplyIds(replies: any[]): string[] {
+    return replies.flatMap(reply => [reply.id, ...this.collectReplyIds(reply.replies)]);
+  }
+  
+  private mapReplies(replies: Comment[]): any[] {
+    return replies.map(reply => ({
+      id: reply.id,
+      content: reply.content,
+      createdAt: reply.createdAt,
+      user: {
+        id: reply.user.id,
+        username: reply.user.username,
+        avatar: reply.user.avatar,
+      },
+      replies: reply.replies ? this.mapReplies(reply.replies) : [],
     }));
   }
+  
+  
 
   async replyToComment(
     createCommentDto: CreateCommentDto,
