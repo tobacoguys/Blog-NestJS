@@ -1,4 +1,4 @@
-import { Injectable, UnauthorizedException } from '@nestjs/common';
+import { Injectable, NotFoundException, UnauthorizedException } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { InjectRepository } from '@nestjs/typeorm';
 import { LoginDto } from 'src/auth/dto/login.dto';
@@ -8,6 +8,7 @@ import { Repository } from 'typeorm';
 import { CreateCategoryDto } from 'src/category/dto/create-category.dto';
 import { Category } from 'src/category/category.entity';
 import * as bcrypt from 'bcrypt';
+import { UpdateCategoryDto } from 'src/category/dto/update-category.dto';
 
 @Injectable()
 export class CmsService {
@@ -85,4 +86,23 @@ export class CmsService {
         await this.categoryRepository.save(category);
         return category;
     }
+
+      async updateCategory(
+        id: string,
+        updateCategoryDto: UpdateCategoryDto,
+      ): Promise<Category> {
+        const { name } = updateCategoryDto;
+
+        const category = await this.categoryRepository.findOne({ where: { id } });
+    
+        const existingCategory = await this.categoryRepository.findOne({ where: { name } });
+        if (existingCategory) {
+            throw new UnauthorizedException('Category already exists');
+        }
+        if (!category) {
+          throw new NotFoundException('Category not found');
+        }
+        const updateCategory = Object.assign(category, updateCategoryDto);
+        return this.categoryRepository.save(updateCategory);
+      }
 }

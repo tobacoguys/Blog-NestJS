@@ -1,4 +1,4 @@
-import { Body, Controller, Post, UseGuards, Request } from '@nestjs/common';
+import { Body, Controller, Post, UseGuards, Request, Patch, UnauthorizedException, Param } from '@nestjs/common';
 import { CmsService } from './cms.service';
 import { SignupDto } from 'src/auth/dto/signup.dto';
 import { ApiBearerAuth, ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
@@ -7,6 +7,7 @@ import { RoleGuard } from 'src/auth/guard/role.guard';
 import { JwtAuthGuard } from 'src/auth/guard/jwt-auth.guard';
 import { CreateCategoryDto } from 'src/category/dto/create-category.dto';
 import { JwtService } from '@nestjs/jwt';
+import { UpdateCategoryDto } from 'src/category/dto/update-category.dto';
 
 @Controller('cms')
 export class CmsController {
@@ -68,5 +69,35 @@ export class CmsController {
     ) {
         const category = await this.cmsService.createCategory(createCategoryDto);
         return { message: 'Category created successfully', data: category };
+    }
+
+    @ApiTags('Cms')
+    @ApiBearerAuth('admin')
+    @ApiOperation({
+        summary: 'Update Category',
+        description: 'Updates a category.',
+    })
+    @ApiResponse({
+        status: 200,
+        description: 'Category updated successfully.',
+        type: UpdateCategoryDto,
+    })
+    @Patch('/category/:id')
+    @UseGuards(JwtAuthGuard, RoleGuard)
+    async updateCategory(
+        @Request() req,
+        @Param('id') id: string,
+        @Body() updateCategoryDto: UpdateCategoryDto,
+    ) {
+        const user = req.user;
+    
+        if (!user || !user.isCreator) {
+            throw new UnauthorizedException('Access denied. Creator only.');
+        }
+        const updateCategory = await this.cmsService.updateCategory(
+            id,
+            updateCategoryDto,
+        );
+        return { data: updateCategory };
     }
 }
