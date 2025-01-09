@@ -24,7 +24,7 @@ export class RatingController {
   async createRating(
     @Req() req,
     @Body('postId') postId: string,
-    @Body('stars') stars: number,
+    @Body('stars') stars: number, 
   ) {
     const userId = req.user.id;
     return this.ratingService.createRating(userId, postId, stars);

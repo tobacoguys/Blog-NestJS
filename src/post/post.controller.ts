@@ -200,8 +200,9 @@ export class PostController {
     type: CreatePostDto,
   })
   @Get('/:postId')
-  async viewPost(@Param('postId') postId: string) {
-    return this.postService.getPostById(postId);
+  async viewPost(@Param('postId') postId: string, @Req() req) {
+    const userId = req.user?.id || 'guest';
+    return this.postService.getPostById(postId, userId);
   }
 
   @ApiTags('Post')

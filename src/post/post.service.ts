@@ -2,6 +2,7 @@ import {
   Injectable,
   NotFoundException,
   UnauthorizedException,
+  Inject,
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
@@ -11,6 +12,8 @@ import { UpdatePostDto } from './dto/update-post.dto';
 import User from 'src/user/user.entity';
 import { Comment } from 'src/comment/comment.entity';
 import { Rating } from 'src/rating/rating.entity';
+import { Cache } from 'cache-manager';
+import { CACHE_MANAGER } from '@nestjs/cache-manager';
 
 @Injectable()
 export class PostService {
@@ -24,6 +27,7 @@ export class PostService {
     private readonly commentRepository: Repository<Comment>,
     @InjectRepository(Rating)
     private readonly ratingRepository: Repository<Rating>,
+    @Inject(CACHE_MANAGER) private cacheManager: Cache,
   ) {}
 
   async createPost(
@@ -124,15 +128,23 @@ export class PostService {
     };
   }
 
-  async getPostById(id: string) {
+  async getPostById(id: string, userId: string) {
     const post = await this.postRepository.findOne({ where: { id } });
 
     if (!post) {
       throw new NotFoundException('Post not found');
     }
 
-    post.viewCount += 1;
-    return this.postRepository.save(post);
+    const cacheKey = `post_view_${id}_${userId}`;
+    const lastViewed = await this.cacheManager.get<number>(cacheKey);
+
+    if (!lastViewed || (Date.now() - lastViewed) > 10000) {
+      post.viewCount += 1;
+      await this.cacheManager.set(cacheKey, Date.now(), 10); // TTL in seconds
+      await this.postRepository.save(post);
+    }
+
+    return post;
   }
 
   async deletePost(

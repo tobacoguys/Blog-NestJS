@@ -24,7 +24,7 @@ export class RatingService {
     }
 
     const existingRating = await this.ratingRepository.findOne({
-      where: { userId, postId },
+      where: { user: { id: userId }, post: { id: postId } },
     });
 
     if (existingRating) {
@@ -32,7 +32,7 @@ export class RatingService {
       return this.ratingRepository.save(existingRating);
     }
 
-    const newRating = this.ratingRepository.create({ userId, postId, stars });
+    const newRating = this.ratingRepository.create({ user: { id: userId }, post: { id: postId }, stars });
     return this.ratingRepository.save(newRating);
   }
 
@@ -47,7 +47,7 @@ export class RatingService {
       throw new NotFoundException('User is not the creator of this post');
     }
 
-    const ratings = await this.ratingRepository.find({ where: { postId } });
+    const ratings = await this.ratingRepository.find({ where: { post: { id: postId } } });
     if (!ratings.length) return 0;
 
     const totalStars = ratings.reduce((sum, rating) => sum + rating.stars, 0);

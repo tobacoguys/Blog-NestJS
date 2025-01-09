@@ -28,6 +28,9 @@ class User {
   @Column({ default: true })
   isCreator: boolean;
 
+  @Column({ default: 'user' })
+  role: string;
+
   @OneToMany(() => Post, (post) => post.user)
   posts: Post[];
 

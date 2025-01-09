@@ -1,5 +1,6 @@
 import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
+import { CacheModule } from '@nestjs/cache-manager';
 import { PostController } from './post.controller';
 import { PostService } from './post.service';
 import { Post } from './post.entity';
@@ -9,7 +10,10 @@ import { Comment } from 'src/comment/comment.entity';
 import { Rating } from 'src/rating/rating.entity';
 
 @Module({
-  imports: [TypeOrmModule.forFeature([Post, Category, User, Comment, Rating])],
+  imports: [
+    TypeOrmModule.forFeature([Post, Category, User, Comment, Rating]),
+    CacheModule.register(),
+  ],
   controllers: [PostController],
   providers: [PostService],
 })
