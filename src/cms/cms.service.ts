@@ -87,10 +87,10 @@ export class CmsService {
         return category;
     }
 
-      async updateCategory(
+    async updateCategory(
         id: string,
         updateCategoryDto: UpdateCategoryDto,
-      ): Promise<Category> {
+    ): Promise<Category> {
         const { name } = updateCategoryDto;
 
         const category = await this.categoryRepository.findOne({ where: { id } });
@@ -104,5 +104,24 @@ export class CmsService {
         }
         const updateCategory = Object.assign(category, updateCategoryDto);
         return this.categoryRepository.save(updateCategory);
-      }
+    }
+
+    async deleteCategory(
+        id: string,
+        isCreator: boolean,
+    ): Promise<{ message: string }> {
+        if (!isCreator) {
+          throw new UnauthorizedException('Access denied. Creator only.');
+        }
+    
+        const category = await this.categoryRepository.findOne({ where: { id } });
+    
+        if (!category) {
+          throw new NotFoundException('Category not found');
+        }
+    
+        await this.categoryRepository.remove(category);
+    
+        return { message: 'Category deleted successfully' };
+    }
 }

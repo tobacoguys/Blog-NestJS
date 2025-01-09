@@ -1,4 +1,4 @@
-import { Body, Controller, Post, UseGuards, Request, Patch, UnauthorizedException, Param } from '@nestjs/common';
+import { Body, Controller, Post, UseGuards, Request, Patch, UnauthorizedException, Param, Delete } from '@nestjs/common';
 import { CmsService } from './cms.service';
 import { SignupDto } from 'src/auth/dto/signup.dto';
 import { ApiBearerAuth, ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
@@ -99,5 +99,23 @@ export class CmsController {
             updateCategoryDto,
         );
         return { data: updateCategory };
+    }
+
+    @ApiTags('Cms')
+    @ApiBearerAuth('admin')
+    @ApiOperation({
+        summary: 'Delete Category',
+        description: 'Deletes a category.',
+    })
+    @ApiResponse({
+        status: 200,
+        description: 'Category deleted successfully.',
+    })
+    @Delete('/category/:id')
+    @UseGuards(JwtAuthGuard, RoleGuard)
+    async deleteCategory(@Param('id') id: string, @Request() req) {
+        const isCreator = req.user?.isCreator;
+        const category = await this.cmsService.deleteCategory(id, isCreator);
+        return category;
     }
 }
