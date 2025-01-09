@@ -12,6 +12,7 @@ import { CommentModule } from './comment/comment.module';
 import { LikeModule } from './like/like.module';
 import { WalletModule } from './wallet/wallet.module';
 import { RatingModule } from './rating/rating.module';
+import { CmsModule } from './cms/cms.module';
 
 @Module({
   imports: [
@@ -36,6 +37,7 @@ import { RatingModule } from './rating/rating.module';
     LikeModule,
     WalletModule,
     RatingModule,
+    CmsModule,
   ],
   controllers: [AppController],
   providers: [AppService],
