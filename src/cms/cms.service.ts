@@ -5,6 +5,8 @@ import { LoginDto } from 'src/auth/dto/login.dto';
 import { SignupDto } from 'src/auth/dto/signup.dto';
 import User from 'src/user/user.entity';
 import { Repository } from 'typeorm';
+import { Category } from 'src/category/category.entity';
+import * as bcrypt from 'bcrypt';
 
 @Injectable()
 export class CmsService {
@@ -12,6 +14,8 @@ export class CmsService {
         @InjectRepository(User)
         private readonly userRepository: Repository<User>,
         private readonly jwtService: JwtService,
+        @InjectRepository(Category)
+        private readonly categoryRepository: Repository<Category>,
     ) {}
 
     async signup(signupDto: SignupDto): Promise<{ message: string }> {
@@ -22,11 +26,13 @@ export class CmsService {
             throw new UnauthorizedException('Email already in use');
         }
 
+        const hashedPassword = await bcrypt.hash(password, 10);
         const admin = this.userRepository.create({
             username: 'admin',
             email,
-            password,
+            password: hashedPassword,
             isActive: true,
+            role: 'admin',
         });
 
         await this.userRepository.save(admin);
@@ -35,25 +41,34 @@ export class CmsService {
         };
     }
 
-    async login(loginDto: LoginDto): Promise<{ admin: any, token: string }> {
+    async login(loginDto: LoginDto): Promise<{ user: any, token: string }> {
     const { email, password } = loginDto;
   
-    const admin = await this.userRepository.findOne({ where: { email } });
+    const user = await this.userRepository.findOne({ where: { email } });
   
-    if (!admin) {
+    if (!user) {
       throw new UnauthorizedException('Invalid email or password');
     }
 
-    if (!password) {
-        throw new UnauthorizedException('Password wrong');
+    const isPasswordValid = await bcrypt.compare(password, user.password);
+    if (!isPasswordValid) {
+        throw new UnauthorizedException('Invalid email or password');
     }
   
     const token = this.jwtService.sign({
-      id: admin.id,
-      username: admin.username,
-      email: admin.email,
+      id: user.id,
+      username: user.username,
+      email: user.email,
     });
   
-    return { admin, token };
+    return { user, token };
     }
+
+    async validateAdmin(username: string, password: string): Promise<User | null> {
+        const admin = await this.userRepository.findOne({ where: { username } });
+        if (admin && await bcrypt.compare(password, admin.password)) {
+            return admin;
+        }
+        return null;
+      }
 }

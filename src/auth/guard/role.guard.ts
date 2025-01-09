@@ -1,14 +1,15 @@
-import { CanActivate, ExecutionContext, Injectable } from "@nestjs/common";
-import { Reflector } from "@nestjs/core";
+import { CanActivate, ExecutionContext, Injectable, UnauthorizedException } from "@nestjs/common";
 
 @Injectable()
 export class RoleGuard implements CanActivate {
-    constructor(private reflector: Reflector) {}
+  canActivate(context: ExecutionContext): boolean {
+    const request = context.switchToHttp().getRequest();
+    const user = request.user;
 
-    canActivate(context: ExecutionContext): boolean {
-        const requiredRole = 'admin';
-        const request = context.switchToHttp().getRequest();
-        const user = request.user;
-        return user?.role === requiredRole;
+    if (!user || user.role !== 'admin') {
+      throw new UnauthorizedException('Access denied. Admin only.');
     }
+
+    return true;
+  }
 }
