@@ -1,4 +1,4 @@
-import { Body, Controller, Post, UseGuards, Request, Patch, UnauthorizedException, Param, Delete } from '@nestjs/common';
+import { Body, Controller, Post, UseGuards, Request, Patch, UnauthorizedException, Param, Delete, Get } from '@nestjs/common';
 import { CmsService } from './cms.service';
 import { SignupDto } from 'src/auth/dto/signup.dto';
 import { ApiBearerAuth, ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
@@ -117,5 +117,11 @@ export class CmsController {
         const isCreator = req.user?.isCreator;
         const category = await this.cmsService.deleteCategory(id, isCreator);
         return category;
+    }
+
+    @Get('/category/get-all')
+      async getAllCategory() {
+        const category = await this.cmsService.getAllCategory();
+        return { message: 'All categories', data: category };
     }
 }

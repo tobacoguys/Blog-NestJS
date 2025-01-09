@@ -124,4 +124,8 @@ export class CmsService {
     
         return { message: 'Category deleted successfully' };
     }
+
+    async getAllCategory(): Promise<Category[]> {
+        return await this.categoryRepository.find();
+      }
 }
