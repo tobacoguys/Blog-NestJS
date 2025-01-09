@@ -124,4 +124,12 @@ export class CmsController {
         const category = await this.cmsService.getAllCategory();
         return { message: 'All categories', data: category };
     }
+
+    @Get('/category/:id')
+    async getCategoryById(@Param('id') id: string) {
+      const category = await this.cmsService.getCategoryById(id);
+      return { data: category };
+    }
+
+    
 }

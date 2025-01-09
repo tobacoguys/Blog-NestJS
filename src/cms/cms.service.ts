@@ -127,5 +127,15 @@ export class CmsService {
 
     async getAllCategory(): Promise<Category[]> {
         return await this.categoryRepository.find();
-      }
+    }
+
+    async getCategoryById(id: string): Promise<Category> {
+        const category = await this.categoryRepository.findOne({ where: { id } });
+    
+        if (!category) {
+          throw new NotFoundException('Category not found');
+        }
+    
+        return category;
+    }
 }
