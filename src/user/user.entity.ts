@@ -28,7 +28,7 @@ class User {
   @Column({ default: true })
   isCreator: boolean;
 
-  @Column({ default: 'user' })
+  @Column({ default: 'admin' })
   role: string;
 
   @OneToMany(() => Post, (post) => post.user)
