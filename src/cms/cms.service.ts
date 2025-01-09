@@ -5,6 +5,7 @@ import { LoginDto } from 'src/auth/dto/login.dto';
 import { SignupDto } from 'src/auth/dto/signup.dto';
 import User from 'src/user/user.entity';
 import { Repository } from 'typeorm';
+import { CreateCategoryDto } from 'src/category/dto/create-category.dto';
 import { Category } from 'src/category/category.entity';
 import * as bcrypt from 'bcrypt';
 
@@ -71,4 +72,17 @@ export class CmsService {
         }
         return null;
       }
+
+    async createCategory(
+        createCategoryDto: CreateCategoryDto,
+    ): Promise<Category>{
+        const { name } = createCategoryDto;
+        const category = this.categoryRepository.create(createCategoryDto);
+        const existingCategory = await this.categoryRepository.findOne({ where: { name } });
+        if (existingCategory) {
+            throw new UnauthorizedException('Category already exists');
+        }
+        await this.categoryRepository.save(category);
+        return category;
+    }
 }

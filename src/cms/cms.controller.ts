@@ -1,8 +1,11 @@
-import { Body, Controller, Post } from '@nestjs/common';
+import { Body, Controller, Post, UseGuards, Request } from '@nestjs/common';
 import { CmsService } from './cms.service';
 import { SignupDto } from 'src/auth/dto/signup.dto';
 import { ApiBearerAuth, ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { LoginDto } from 'src/auth/dto/login.dto';
+import { RoleGuard } from 'src/auth/guard/role.guard';
+import { JwtAuthGuard } from 'src/auth/guard/jwt-auth.guard';
+import { CreateCategoryDto } from 'src/category/dto/create-category.dto';
 import { JwtService } from '@nestjs/jwt';
 
 @Controller('cms')
@@ -44,5 +47,26 @@ export class CmsController {
         const { email, password } = loginDto;
         const user = await this.cmsService.login({ email, password });
         return user;
+    }
+
+    @ApiTags('Cms')
+    @ApiBearerAuth('admin')
+    @ApiOperation({
+        summary: 'Create Category',
+        description: 'Creates a new category.',
+    })
+    @ApiResponse({
+        status: 201,
+        description: 'Category created successfully.',
+        type: CreateCategoryDto,
+    })
+    @Post('/category/create')
+    @UseGuards(JwtAuthGuard, RoleGuard)
+    async createCategory(
+        @Request() req,
+        @Body() createCategoryDto: CreateCategoryDto,
+    ) {
+        const category = await this.cmsService.createCategory(createCategoryDto);
+        return { message: 'Category created successfully', data: category };
     }
 }
