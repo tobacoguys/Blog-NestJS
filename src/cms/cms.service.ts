@@ -149,6 +149,15 @@ export class CmsService {
         return category;
     }
 
+    async deleteUser(id: string): Promise<{ message: string }> {
+        const user = await this.userRepository.findOne({ where: { id } });
+        if (!user) {
+            throw new NotFoundException('User not found');
+        }
+        await this.userRepository.remove(user);
+        return { message: 'User deleted successfully' };
+    }
+
     @Cron(CronExpression.EVERY_DAY_AT_MIDNIGHT)
     async calculateDailyEarning() {
         const posts = await this.postRepository.find({ relations: ['user'] });

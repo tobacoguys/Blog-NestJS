@@ -168,4 +168,20 @@ export class CmsController {
     async calculateDailyEarnings() {
         return this.cmsService.calculateDailyEarning();
     }
+
+    @ApiTags('Cms')
+    @ApiBearerAuth('admin')
+    @ApiOperation({
+        summary: 'Delete User',
+        description: 'Deletes a user by ID.',
+    })
+    @ApiResponse({
+        status: 200,
+        description: 'User deleted successfully.',
+    })
+    @Delete('/user/:id')
+    @UseGuards(JwtAuthGuard, RoleGuard)
+    async deleteUser(@Param('id') id: string) {
+        return this.cmsService.deleteUser(id);
+    }
 }
