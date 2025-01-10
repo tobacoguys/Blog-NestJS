@@ -186,7 +186,7 @@ export class CmsController {
         return this.cmsService.deleteUser(id);
     }
 
-    @ApiTags('Post')
+    @ApiTags('Cms')
     @ApiBearerAuth('admin')
     @ApiOperation({
       summary: 'Delete a post',
@@ -202,5 +202,23 @@ export class CmsController {
     async deletePost(@Param('id') id: string) {
       const post = await this.cmsService.deletePost(id);
       return post;
+    }
+
+    @ApiTags('Cms')
+    @ApiBearerAuth('admin')
+    @ApiOperation({
+      summary: 'Update a post image',
+      description: 'Allows a creator to update a post image by ID.',
+    })
+    @ApiResponse({
+      status: 200,
+      description: 'The post image was updated successfully',
+      type: CreatePostDto,
+    })
+    @Get('/report/get-all')
+    @UseGuards(JwtAuthGuard, RoleGuard)
+    async getAllReport() {
+      const report = await this.cmsService.getAllReport();
+      return { message: 'All reports', data: report };
     }
 }

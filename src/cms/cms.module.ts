@@ -14,10 +14,11 @@ import { Post } from 'src/post/post.entity';
 import { DailyEarning } from 'src/wallet/entity/daily-earning.entity';
 import { Rating } from 'src/rating/rating.entity';
 import { Comment } from 'src/comment/comment.entity';
+import { Report } from 'src/report/report.entity';
 
 @Module({
   imports: [
-    TypeOrmModule.forFeature([User, Category, Post, DailyEarning, Rating, Comment]),
+    TypeOrmModule.forFeature([User, Category, Post, DailyEarning, Rating, Comment, Report]),
     ConfigModule,
     PassportModule.register({ defaultStrategy: 'jwt' }),
     JwtModule.registerAsync({

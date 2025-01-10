@@ -14,6 +14,7 @@ import { Post } from 'src/post/post.entity';
 import { Cron, CronExpression } from '@nestjs/schedule';
 import { Rating } from 'src/rating/rating.entity';
 import { Comment } from 'src/comment/comment.entity';
+import { Report } from 'src/report/report.entity';
 
 @Injectable()
 export class CmsService {
@@ -31,6 +32,8 @@ export class CmsService {
         private readonly ratingRepository: Repository<Rating>,
         @InjectRepository(Comment)
         private readonly commentRepository: Repository<Comment>,
+        @InjectRepository(Report)
+        private readonly reportRepository: Repository<Report>,
     ) {}
 
     async signup(signupDto: SignupDto): Promise<{ message: string }> {
@@ -218,7 +221,7 @@ export class CmsService {
 
     async deletePost(
         id: string,
-      ): Promise<{ message: string }> {
+    ): Promise<{ message: string }> {
     
         const post = await this.postRepository.findOne({ where: { id } });
     
@@ -231,5 +234,9 @@ export class CmsService {
         await this.postRepository.remove(post);
     
         return { message: 'Post deleted successfully' };
-      }
+    }
+
+    async getAllReport() {
+        return await this.reportRepository.find();
+    }
 }
