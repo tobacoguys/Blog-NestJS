@@ -9,6 +9,10 @@ import { CreateCategoryDto } from 'src/category/dto/create-category.dto';
 import { Category } from 'src/category/category.entity';
 import * as bcrypt from 'bcrypt';
 import { UpdateCategoryDto } from 'src/category/dto/update-category.dto';
+import { Wallet } from 'src/wallet/entity/wallet.entity';
+import { DailyEarning } from 'src/wallet/entity/daily-earning.entity';
+import { Post } from 'src/post/post.entity';
+import { Cron, CronExpression } from '@nestjs/schedule';
 
 @Injectable()
 export class CmsService {
@@ -18,6 +22,12 @@ export class CmsService {
         private readonly jwtService: JwtService,
         @InjectRepository(Category)
         private readonly categoryRepository: Repository<Category>,
+        @InjectRepository(Wallet)
+        private walletRepository: Repository<Wallet>,
+        @InjectRepository(DailyEarning)
+        private dailyEarningRepository: Repository<DailyEarning>,
+        @InjectRepository(Post)
+        private postRepository: Repository<Post>,
     ) {}
 
     async signup(signupDto: SignupDto): Promise<{ message: string }> {
@@ -137,5 +147,60 @@ export class CmsService {
         }
     
         return category;
+    }
+
+    @Cron(CronExpression.EVERY_DAY_AT_MIDNIGHT)
+    async calculateDailyEarning() {
+        const posts = await this.postRepository.find({ relations: ['user'] });
+        const today = new Date();
+        const todayString = today.toISOString().split('T')[0];
+    
+        const result: Array<{
+            creatorId: string;
+            viewsToday: number;
+            earningToday: number;
+            postId: string;
+        }> = [];
+    
+        for (const post of posts) {
+            if (!post.user) {
+                console.warn(`Post with ID ${post.id} has no associated user.`);
+                continue;
+            }
+    
+            const earning = post.viewCount * 2;
+            let dailyEarning = await this.dailyEarningRepository.findOne({
+                where: { creatorId: post.user.id, date: todayString as unknown as Date },
+            });
+    
+            if (dailyEarning) {
+                dailyEarning.viewsToday += post.viewCount;
+                dailyEarning.earningToday += earning;
+            } else {
+                dailyEarning = this.dailyEarningRepository.create({
+                    creatorId: post.user.id,
+                    date: today,
+                    viewsToday: post.viewCount,
+                    earningToday: earning,
+                    postId: post.id,
+                });
+            }
+            await this.dailyEarningRepository.save(dailyEarning);
+    
+            result.push({
+                creatorId: post.user.id,
+                viewsToday: dailyEarning.viewsToday,
+                earningToday: dailyEarning.earningToday,
+                postId: post.id,
+            });
+    
+            post.viewCount = 0;
+            await this.postRepository.save(post);
+        }
+    
+        return {
+            message: 'Daily earnings calculated successfully',
+            result,
+        };
     }
 }

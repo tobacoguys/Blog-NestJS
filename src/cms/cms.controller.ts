@@ -153,5 +153,19 @@ export class CmsController {
       return { data: category };
     }
 
-    
+    @ApiTags('Cms')
+    @ApiBearerAuth('admin')
+    @ApiOperation({
+        summary: 'Calculate Daily Earnings',
+        description: 'Calculates daily earnings.',
+    })
+    @ApiResponse({
+        status: 200,
+        description: 'Daily earnings calculated successfully.',
+    })
+    @Post('/wallet/daily')
+    @UseGuards(JwtAuthGuard, RoleGuard)
+    async calculateDailyEarnings() {
+        return this.cmsService.calculateDailyEarning();
+    }
 }

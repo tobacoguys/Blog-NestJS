@@ -10,10 +10,13 @@ import { ConfigModule, ConfigService } from '@nestjs/config';
 import { PassportModule } from '@nestjs/passport';
 import { JwtStrategy } from 'src/auth/strategy/jwt.strategy';
 import { JwtAuthGuard } from 'src/auth/guard/jwt-auth.guard';
+import { Post } from 'src/post/post.entity';
+import { Wallet } from 'src/wallet/entity/wallet.entity';
+import { DailyEarning } from 'src/wallet/entity/daily-earning.entity';
 
 @Module({
   imports: [
-    TypeOrmModule.forFeature([User, Category]),
+    TypeOrmModule.forFeature([User, Category, Post, Wallet, DailyEarning]),
     ConfigModule,
     PassportModule.register({ defaultStrategy: 'jwt' }),
     JwtModule.registerAsync({
