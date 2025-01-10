@@ -119,12 +119,34 @@ export class CmsController {
         return category;
     }
 
+    @ApiTags('Cms')
+    @ApiBearerAuth('admin')
+    @ApiOperation({
+        summary: 'Get All Categories',
+        description: 'Returns all categories.',
+    })
+    @ApiResponse({
+        status: 200,
+        description: 'All categories returned successfully.',
+        type: CreateCategoryDto,
+    })
     @Get('/category/get-all')
       async getAllCategory() {
         const category = await this.cmsService.getAllCategory();
         return { message: 'All categories', data: category };
     }
 
+    @ApiTags('Cms')
+    @ApiBearerAuth('admin')
+    @ApiOperation({
+        summary: 'Get Category By Id',
+        description: 'Returns a category by ID.',
+    })
+    @ApiResponse({
+        status: 200,
+        description: 'Category returned successfully.',
+        type: CreateCategoryDto,
+    })
     @Get('/category/:id')
     async getCategoryById(@Param('id') id: string) {
       const category = await this.cmsService.getCategoryById(id);
