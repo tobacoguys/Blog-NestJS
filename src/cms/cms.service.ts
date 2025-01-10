@@ -239,4 +239,24 @@ export class CmsService {
     async getAllReport() {
         return await this.reportRepository.find();
     }
+
+    async findUserById(id: string): Promise<User> {
+        return this.userRepository.findOne({ where: { id } });
+    }
+
+    async findPostById(id: string): Promise<Post> {
+        return this.postRepository.findOne({ where: { id }, relations: ['user'] });
+    }
+
+    async notifyPostDeletion(userId: string, title: string): Promise<{ message: string }> {
+        const creator = await this.userRepository.findOne({ where: { id: userId } });
+    
+        if (!creator || !creator.isCreator) {
+          throw new UnauthorizedException('User is not a creator');
+        }
+    
+        console.log(`Notify Creator (${creator.username}): Your post "${title}" has been deleted.`);
+    
+        return { message: `Notification sent to creator: ${creator.username}` };
+    }
 }

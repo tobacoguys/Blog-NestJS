@@ -221,4 +221,29 @@ export class CmsController {
       const report = await this.cmsService.getAllReport();
       return { message: 'All reports', data: report };
     }
+
+    @ApiTags('Cms')
+    @ApiBearerAuth('admin')
+    @ApiOperation({
+        summary: 'Notify posted report',
+        description: 'Notifies a creator that their post has been deleted.',
+    })
+    @ApiResponse({
+        status: 200,
+        description: 'Notification sent successfully.',
+    })
+    @Post('/notify')
+    @UseGuards(JwtAuthGuard, RoleGuard)
+    async notifyPostDeletion(
+      @Body() body: { postId: string },
+    ) {
+      const { postId } = body;
+
+      const post = await this.cmsService.findPostById(postId);
+      if (!post || !post.user || !post.user.isCreator) {
+        throw new UnauthorizedException('Post not found or user is not a creator');
+      }
+
+      return this.cmsService.notifyPostDeletion(post.user.id, post.title);
+    }
 }
