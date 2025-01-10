@@ -1,7 +1,8 @@
 import { Like } from 'src/like/like.entity';
 import { Post } from 'src/post/post.entity';
 import { Report } from 'src/report/report.entity';
-import { Column, Entity, OneToMany, PrimaryGeneratedColumn } from 'typeorm';
+import { Wallet } from 'src/wallet/entity/wallet.entity';
+import { Column, Entity, OneToMany, OneToOne, JoinColumn, PrimaryGeneratedColumn } from 'typeorm';
 
 @Entity('user')
 class User {
@@ -49,6 +50,10 @@ class User {
 
   @Column({ default: false })
   isActive: boolean;
+
+  @OneToOne(() => Wallet)
+  @JoinColumn()
+  wallet: Wallet;
 
 }
 

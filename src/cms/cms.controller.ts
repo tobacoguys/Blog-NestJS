@@ -158,7 +158,7 @@ export class CmsController {
     @ApiBearerAuth('admin')
     @ApiOperation({
         summary: 'Calculate Daily Earnings',
-        description: 'Calculates daily earnings.',
+        description: 'Manually calculates daily earnings.',
     })
     @ApiResponse({
         status: 200,

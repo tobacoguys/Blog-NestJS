@@ -11,10 +11,10 @@ import * as bcrypt from 'bcrypt';
 import { UpdateCategoryDto } from 'src/category/dto/update-category.dto';
 import { DailyEarning } from 'src/wallet/entity/daily-earning.entity';
 import { Post } from 'src/post/post.entity';
-import { Cron, CronExpression } from '@nestjs/schedule';
 import { Rating } from 'src/rating/rating.entity';
 import { Comment } from 'src/comment/comment.entity';
 import { Report } from 'src/report/report.entity';
+import { Wallet } from 'src/wallet/entity/wallet.entity';
 
 @Injectable()
 export class CmsService {
@@ -34,6 +34,8 @@ export class CmsService {
         private readonly commentRepository: Repository<Comment>,
         @InjectRepository(Report)
         private readonly reportRepository: Repository<Report>,
+        @InjectRepository(Wallet)
+        private readonly walletRepository: Repository<Wallet>,
     ) {}
 
     async signup(signupDto: SignupDto): Promise<{ message: string }> {
@@ -164,7 +166,6 @@ export class CmsService {
         return { message: 'User deleted successfully' };
     }
 
-    @Cron(CronExpression.EVERY_DAY_AT_MIDNIGHT)
     async calculateDailyEarning() {
         const posts = await this.postRepository.find({ relations: ['user'] });
         const today = new Date();
