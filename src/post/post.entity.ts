@@ -36,9 +36,11 @@ export class Post {
   user: User;
 
   @OneToMany(() => Like, (like) => like.post)
+  @JoinColumn({ name: 'likeId' })
   likes: Like[];
 
   @OneToMany(() => Report, (report) => report.post)
+  @JoinColumn({ name: 'reportId' })
   reports: Report[];
 
   @Column({ default: 0 })

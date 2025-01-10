@@ -6,5 +6,5 @@ export class CreateReportDto {
   reason: string;
 
   @IsNotEmpty()
-  postId: number;
+  postId: string;
 }

@@ -13,8 +13,6 @@ import { LikeModule } from './like/like.module';
 import { WalletModule } from './wallet/wallet.module';
 import { RatingModule } from './rating/rating.module';
 import { CmsModule } from './cms/cms.module';
-import { ReportController } from './report/report.controller';
-import { ReportService } from './report/report.service';
 import { ReportModule } from './report/report.module';
 
 @Module({
@@ -43,7 +41,7 @@ import { ReportModule } from './report/report.module';
     CmsModule,
     ReportModule,
   ],
-  controllers: [AppController, ReportController],
-  providers: [AppService, ReportService],
+  controllers: [AppController],
+  providers: [AppService],
 })
 export class AppModule {}
