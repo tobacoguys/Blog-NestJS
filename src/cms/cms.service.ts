@@ -260,4 +260,15 @@ export class CmsService {
     
         return { message: `Notification sent to creator: ${creator.username}` };
     }
+
+    async getListOfViews(): Promise<{ author: string, postId: string; title: string; viewCount: number; Paid: number }[]> {
+        const posts = await this.postRepository.find({ relations: ['user'] });
+        return posts.map(post => ({
+            author: post.user.username,
+            postId: post.id,
+            title: post.title,
+            viewCount: post.viewCount,
+            Paid: post.viewCount * 2,
+        }));
+    }
 }

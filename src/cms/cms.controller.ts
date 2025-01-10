@@ -246,4 +246,20 @@ export class CmsController {
 
       return this.cmsService.notifyPostDeletion(post.user.id, post.title);
     }
+
+    @ApiTags('Cms')
+    @ApiBearerAuth('admin')
+    @ApiOperation({
+        summary: 'Get List of Views',
+        description: 'Returns a list of views for all posts along with the amount to be paid.',
+    })
+    @ApiResponse({
+        status: 200,
+        description: 'List of views returned successfully.',
+    })
+    @Get('/views')
+    @UseGuards(JwtAuthGuard, RoleGuard)
+    async getListOfViews() {
+        return this.cmsService.getListOfViews();
+    }
 }
