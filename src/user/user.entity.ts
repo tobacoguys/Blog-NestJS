@@ -1,5 +1,6 @@
 import { Like } from 'src/like/like.entity';
 import { Post } from 'src/post/post.entity';
+import { Report } from 'src/report/report.entity';
 import { Column, Entity, OneToMany, PrimaryGeneratedColumn } from 'typeorm';
 
 @Entity('user')
@@ -36,6 +37,9 @@ class User {
 
   @OneToMany(() => Like, (like) => like.user)
   likes: Like[];
+
+  @OneToMany(() => Report, (report) => report.reportedBy)
+  reports: Report[];
 
   @Column({ nullable: true })
   otp: string;

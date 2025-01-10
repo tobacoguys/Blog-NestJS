@@ -13,6 +13,9 @@ import { LikeModule } from './like/like.module';
 import { WalletModule } from './wallet/wallet.module';
 import { RatingModule } from './rating/rating.module';
 import { CmsModule } from './cms/cms.module';
+import { ReportController } from './report/report.controller';
+import { ReportService } from './report/report.service';
+import { ReportModule } from './report/report.module';
 
 @Module({
   imports: [
@@ -38,8 +41,9 @@ import { CmsModule } from './cms/cms.module';
     WalletModule,
     RatingModule,
     CmsModule,
+    ReportModule,
   ],
-  controllers: [AppController],
-  providers: [AppService],
+  controllers: [AppController, ReportController],
+  providers: [AppService, ReportService],
 })
 export class AppModule {}

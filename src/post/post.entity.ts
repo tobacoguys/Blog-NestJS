@@ -11,6 +11,7 @@ import {
 import { Category } from '../category/category.entity';
 import User from '../user/user.entity';
 import { Like } from 'src/like/like.entity';
+import { Report } from 'src/report/report.entity';
 
 @Entity()
 export class Post {
@@ -36,6 +37,9 @@ export class Post {
 
   @OneToMany(() => Like, (like) => like.post)
   likes: Like[];
+
+  @OneToMany(() => Report, (report) => report.post)
+  reports: Report[];
 
   @Column({ default: 0 })
   viewCount: number;
