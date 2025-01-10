@@ -8,6 +8,7 @@ import { JwtAuthGuard } from 'src/auth/guard/jwt-auth.guard';
 import { CreateCategoryDto } from 'src/category/dto/create-category.dto';
 import { JwtService } from '@nestjs/jwt';
 import { UpdateCategoryDto } from 'src/category/dto/update-category.dto';
+import { CreatePostDto } from 'src/post/dto/create-post.dto';
 
 @Controller('cms')
 export class CmsController {
@@ -183,5 +184,23 @@ export class CmsController {
     @UseGuards(JwtAuthGuard, RoleGuard)
     async deleteUser(@Param('id') id: string) {
         return this.cmsService.deleteUser(id);
+    }
+
+    @ApiTags('Post')
+    @ApiBearerAuth('admin')
+    @ApiOperation({
+      summary: 'Delete a post',
+      description: 'Allows a creator to delete a post by ID.',
+    })
+    @ApiResponse({
+      status: 200,
+      description: 'The post was deleted successfully',
+      type: CreatePostDto,
+    })
+    @Delete('/post/:id')
+    @UseGuards(JwtAuthGuard, RoleGuard)
+    async deletePost(@Param('id') id: string) {
+      const post = await this.cmsService.deletePost(id);
+      return post;
     }
 }

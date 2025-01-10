@@ -9,10 +9,11 @@ import { CreateCategoryDto } from 'src/category/dto/create-category.dto';
 import { Category } from 'src/category/category.entity';
 import * as bcrypt from 'bcrypt';
 import { UpdateCategoryDto } from 'src/category/dto/update-category.dto';
-import { Wallet } from 'src/wallet/entity/wallet.entity';
 import { DailyEarning } from 'src/wallet/entity/daily-earning.entity';
 import { Post } from 'src/post/post.entity';
 import { Cron, CronExpression } from '@nestjs/schedule';
+import { Rating } from 'src/rating/rating.entity';
+import { Comment } from 'src/comment/comment.entity';
 
 @Injectable()
 export class CmsService {
@@ -22,12 +23,14 @@ export class CmsService {
         private readonly jwtService: JwtService,
         @InjectRepository(Category)
         private readonly categoryRepository: Repository<Category>,
-        @InjectRepository(Wallet)
-        private walletRepository: Repository<Wallet>,
         @InjectRepository(DailyEarning)
         private dailyEarningRepository: Repository<DailyEarning>,
         @InjectRepository(Post)
         private postRepository: Repository<Post>,
+        @InjectRepository(Rating)
+        private readonly ratingRepository: Repository<Rating>,
+        @InjectRepository(Comment)
+        private readonly commentRepository: Repository<Comment>,
     ) {}
 
     async signup(signupDto: SignupDto): Promise<{ message: string }> {
@@ -212,4 +215,21 @@ export class CmsService {
             result,
         };
     }
+
+    async deletePost(
+        id: string,
+      ): Promise<{ message: string }> {
+    
+        const post = await this.postRepository.findOne({ where: { id } });
+    
+        if (!post) {
+          throw new NotFoundException('Post not found');
+        }
+    
+        await this.commentRepository.delete({ post: { id: post.id } });
+        await this.ratingRepository.delete({ post: { id: post.id } });
+        await this.postRepository.remove(post);
+    
+        return { message: 'Post deleted successfully' };
+      }
 }

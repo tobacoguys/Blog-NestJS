@@ -131,7 +131,7 @@ export class PostController {
   })
   @Delete('/:id')
   @UseGuards(JwtAuthGuard)
-  async deleteCategory(@Param('id') id: string, @Request() req) {
+  async deletePost(@Param('id') id: string, @Request() req) {
     const isCreator = req.user?.isCreator;
     const post = await this.postService.deletePost(id, isCreator);
     return post;
