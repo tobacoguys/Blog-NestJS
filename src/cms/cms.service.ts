@@ -238,7 +238,18 @@ export class CmsService {
     }
 
     async getAllReport() {
-        return await this.reportRepository.find();
+        const reports = await this.reportRepository.find({ relations: ['post', 'reportedBy'] });
+        return reports.map(report => ({
+            id: report.id,
+            reason: report.reason,
+            postId: report.post.id,
+            reportedAt: report.reportedAt,
+            reportedBy: {
+                id: report.reportedBy.id,
+                username: report.reportedBy.username,
+                email: report.reportedBy.email,
+            },
+        }));
     }
 
     async findUserById(id: string): Promise<User> {

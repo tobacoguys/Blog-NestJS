@@ -1,7 +1,6 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
-import { CreateReportDto } from './dto/create-report.dto';
 import { Report } from './report.entity';
 import { Post } from 'src/post/post.entity';
 import User from 'src/user/user.entity';
@@ -17,9 +16,7 @@ export class ReportService {
     private readonly userRepository: Repository<User>,
   ) {}
 
-  async createReport(createReportDto: CreateReportDto, userId: string): Promise<Report> {
-    const { reason, postId } = createReportDto;
-
+  async createReport(reason: string, postId: string, userId: string): Promise<Report> {
     const post = await this.postRepository.findOne({ where: { id: postId } });
     if (!post) {
       throw new NotFoundException('Post not found');
