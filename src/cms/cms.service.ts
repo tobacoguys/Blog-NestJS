@@ -4,7 +4,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { LoginDto } from 'src/auth/dto/login.dto';
 import { SignupDto } from 'src/auth/dto/signup.dto';
 import User from 'src/user/user.entity';
-import { Repository } from 'typeorm';
+import { IsNull, Not, Repository } from 'typeorm';
 import { CreateCategoryDto } from 'src/category/dto/create-category.dto';
 import { Category } from 'src/category/category.entity';
 import * as bcrypt from 'bcrypt';
@@ -183,12 +183,27 @@ export class CmsService {
         return { message: 'Post deleted successfully' };
     }
 
-    async getAllReport() {
-        const reports = await this.reportRepository.find({ relations: ['post', 'reportedBy'] });
+    async getAllPostReport() {
+        const reports = await this.reportRepository.find({ where: { post: Not(IsNull()) }, relations: ['post', 'reportedBy'] });
         return reports.map(report => ({
             id: report.id,
             reason: report.reason,
             postId: report.post.id,
+            reportedAt: report.reportedAt,
+            reportedBy: {
+                id: report.reportedBy.id,
+                username: report.reportedBy.username,
+                email: report.reportedBy.email,
+            },
+        }));
+    }
+
+    async getAllCommentReport() {
+        const reports = await this.reportRepository.find({ where: { comment: Not(IsNull()) }, relations: ['comment', 'reportedBy'] });
+        return reports.map(report => ({
+            id: report.id,
+            reason: report.reason,
+            commentId: report.comment.id,
             reportedAt: report.reportedAt,
             reportedBy: {
                 id: report.reportedBy.id,

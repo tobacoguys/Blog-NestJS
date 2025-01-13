@@ -207,24 +207,6 @@ export class CmsController {
     @ApiTags('Cms')
     @ApiBearerAuth('admin')
     @ApiOperation({
-      summary: 'Update a post image',
-      description: 'Allows a creator to update a post image by ID.',
-    })
-    @ApiResponse({
-      status: 200,
-      description: 'The post image was updated successfully',
-      type: CreatePostDto,
-    })
-    @Get('/report/get-all')
-    @UseGuards(JwtAuthGuard, RoleGuard)
-    async getAllReport() {
-      const report = await this.cmsService.getAllReport();
-      return { message: 'All reports', data: report };
-    }
-
-    @ApiTags('Cms')
-    @ApiBearerAuth('admin')
-    @ApiOperation({
         summary: 'Notify posted report',
         description: 'Notifies a creator that their post has been deleted.',
     })
@@ -278,5 +260,39 @@ export class CmsController {
     async getAllUsers() {
         const users = await this.cmsService.getAllUsers();
         return { message: 'All users', data: users };
+    }
+
+    @ApiTags('Cms')
+    @ApiBearerAuth('admin')
+    @ApiOperation({
+        summary: 'Get All Post Reports',
+        description: 'Returns all post reports.',
+    })
+    @ApiResponse({
+        status: 200,
+        description: 'All post reports returned successfully.',
+    })
+    @Get('/report/post/get-all')
+    @UseGuards(JwtAuthGuard, RoleGuard)
+    async getAllPostReport() {
+        const report = await this.cmsService.getAllPostReport();
+        return { message: 'All post reports', data: report };
+    }
+
+    @ApiTags('Cms')
+    @ApiBearerAuth('admin')
+    @ApiOperation({
+        summary: 'Get All Comment Reports',
+        description: 'Returns all comment reports.',
+    })
+    @ApiResponse({
+        status: 200,
+        description: 'All comment reports returned successfully.',
+    })
+    @Get('/report/comment/get-all')
+    @UseGuards(JwtAuthGuard, RoleGuard)
+    async getAllCommentReport() {
+        const report = await this.cmsService.getAllCommentReport();
+        return { message: 'All comment reports', data: report };
     }
 }
