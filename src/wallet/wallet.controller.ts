@@ -1,7 +1,6 @@
 import { Controller, Post, UseGuards, Req, UnauthorizedException, Get, Body } from '@nestjs/common';
 import { WalletService } from './wallet.service';
 import { JwtAuthGuard } from 'src/auth/guard/jwt-auth.guard';
-import { ApiKeyGuard } from 'src/auth/guard/api-key.guard';
 import { ApiBearerAuth, ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { CreateWalletDto } from './dto/create-wallet.dto';
 
@@ -53,22 +52,6 @@ export class WalletController {
     }
 
     return this.walletService.getWalletByCreatorId(user.id);
-  }
-
-  @ApiTags('Wallet')
-  @ApiBearerAuth('api-key')
-  @ApiOperation({
-    summary: 'Calculate Daily Earnings',
-    description: 'Calculate daily earnings for all creators with API key authentication.',
-  })
-  @ApiResponse({
-    status: 200,
-    description: 'Daily earnings calculated successfully.',
-  })
-  @Post('daily')
-  @UseGuards(ApiKeyGuard)
-  async calculateDailyEarnings() {
-    return this.walletService.calculateDailyEarning();
   }
 
   @ApiTags('Wallet')
