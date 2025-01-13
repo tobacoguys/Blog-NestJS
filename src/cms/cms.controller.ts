@@ -262,4 +262,21 @@ export class CmsController {
     async getListOfViews() {
         return this.cmsService.getListOfViews();
     }
+
+    @ApiTags('Cms')
+    @ApiBearerAuth('admin')
+    @ApiOperation({
+        summary: 'Get All Users',
+        description: 'Returns all users.',
+    })
+    @ApiResponse({
+        status: 200,
+        description: 'All users returned successfully.',
+    })
+    @Get('/users')
+    @UseGuards(JwtAuthGuard, RoleGuard)
+    async getAllUsers() {
+        const users = await this.cmsService.getAllUsers();
+        return { message: 'All users', data: users };
+    }
 }

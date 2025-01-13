@@ -297,4 +297,8 @@ export class CmsService {
       result,
     };
   }
+
+  async getAllUsers(): Promise<User[]> {
+    return this.userRepository.find();
+  }
 }
