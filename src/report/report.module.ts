@@ -5,9 +5,10 @@ import { Post } from 'src/post/post.entity';
 import User from 'src/user/user.entity';
 import { ReportService } from './report.service';
 import { ReportController } from './report.controller';
+import { Comment } from 'src/comment/comment.entity';
 
 @Module({
-  imports: [TypeOrmModule.forFeature([Report, Post, User])],
+  imports: [TypeOrmModule.forFeature([Report, Post, User, Comment])],
   controllers: [ReportController],
   providers: [ReportService],
 })

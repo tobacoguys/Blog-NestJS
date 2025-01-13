@@ -19,13 +19,35 @@ export class ReportController {
     description: 'Report created successfully',
     type: CreateReportDto,
   })
-  @Post('/create/:postId')
+  @Post('/post/:postId')
   @UseGuards(JwtAuthGuard)
   async createReport(@Param('postId') postId: string, @Body('reason') reason: string, @Request() req) {
     const userId = req.user.id;
     const report = await this.reportService.createReport(reason, postId, userId);
     return {
       message: 'Report created successfully',
+      data: report,
+    };
+  }
+
+  @ApiTags('Report')
+  @ApiBearerAuth('token')
+  @ApiOperation({ 
+    summary: 'Create a comment report',
+    description: 'Allows a logged-in user to report a comment'  
+  }) 
+  @ApiResponse({
+    status: 201,
+    description: 'Comment report created successfully',
+    type: CreateReportDto,
+  })
+  @Post('/comment/:commentId')
+  @UseGuards(JwtAuthGuard)
+  async createCommentReport(@Param('commentId') commentId: string, @Body('reason') reason: string, @Request() req) {
+    const userId = req.user.id;
+    const report = await this.reportService.createCommentReport(reason, commentId, userId);
+    return {
+      message: 'Comment report created successfully',
       data: report,
     };
   }

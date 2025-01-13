@@ -9,6 +9,7 @@ import {
 } from 'typeorm';
 import { Post } from '../post/post.entity';
 import User from '../user/user.entity';
+import { Report } from 'src/report/report.entity';
 
 @Entity()
 export class Comment {
@@ -32,6 +33,9 @@ export class Comment {
 
   @OneToMany(() => Comment, (comment) => comment.parent)
   replies: Comment[];
+
+  @OneToMany(() => Report, (report) => report.comment)
+  reports: Report[];
 
   @CreateDateColumn()
   createdAt: Date;
